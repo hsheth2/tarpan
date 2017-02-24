@@ -1,0 +1,16 @@
+sudo: required
+dist: precise
+
+language: cpp
+
+before-install:
+  - sudo apt-get -qq update
+  - sudo apt-get install -y gawk libreadline-dev autoconf automake bison byacc flex help2man texinfo libc-ares-dev 
+
+install: 
+  - ./update-autotools
+  - autoreconf
+
+script:
+  - ./configure --enable-vtysh --disable-doc --disable-ripd --disable-ripngd --disable-ospfd --disable-ospf6d --disable-nhrpd --disable-isisd --disable-pimd --disable-ospfapi --disable-ospfclient --disable-rtadv
+  - make && make check && sudo make install
