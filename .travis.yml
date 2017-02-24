@@ -10,7 +10,9 @@ before-install:
 install: 
   - ./update-autotools
   - autoreconf
+  - libtoolize -c
+  - automake --gnu --add-missing --copy
 
 script:
-  - ./configure --enable-vtysh --disable-doc --disable-ripd --disable-ripngd --disable-ospfd --disable-ospf6d --disable-nhrpd --disable-isisd --disable-pimd --disable-ospfapi --disable-ospfclient --disable-rtadv
+  - ./configure --enable-vtysh --disable-ripd --disable-ripngd --disable-ospfd --disable-ospf6d --disable-babeld --disable-isisd --disable-opaque-lsa --disable-ospfclient --disable-ospf-te
   - make && make check && sudo make install
