@@ -80,7 +80,7 @@ extern unsigned long term_bgp_debug_zebra;
 
 #define BGP_DEBUG_AS4                 0x01
 #define BGP_DEBUG_AS4_SEGMENT         0x02
-
+//P BGP debug flags
 #define BGP_DEBUG_FSM                 0x01
 #define BGP_DEBUG_EVENTS              0x01
 #define BGP_DEBUG_PACKET              0x01

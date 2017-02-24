@@ -46,6 +46,7 @@ unsigned long conf_bgp_debug_update;
 unsigned long conf_bgp_debug_normal;
 unsigned long conf_bgp_debug_zebra;
 
+//P debug variables for BGP
 unsigned long term_bgp_debug_as4;
 unsigned long term_bgp_debug_fsm;
 unsigned long term_bgp_debug_events;

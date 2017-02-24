@@ -231,7 +231,7 @@ static struct transit *
 transit_intern (struct transit *transit)
 {
   struct transit *find;
-
+  //P here is where data is interned
   find = hash_get (transit_hash, transit, transit_hash_alloc);
   if (find != transit)
     transit_free (transit);
@@ -245,7 +245,7 @@ transit_unintern (struct transit *transit)
 {
   if (transit->refcnt)
     transit->refcnt--;
-
+  //P here is where data is uninterned
   if (transit->refcnt == 0)
     {
       hash_release (transit_hash, transit);
@@ -303,6 +303,7 @@ bgp_attr_extra_free (struct attr *attr)
     }
 }
 
+//P allocate a new attr extra struct if needed
 struct attr_extra *
 bgp_attr_extra_get (struct attr *attr)
 {
@@ -478,6 +479,7 @@ attr_show_all (struct vty *vty)
 		vty);
 }
 
+//P perform a deep copy of the attr
 static void *
 bgp_attr_hash_alloc (void *p)
 {
@@ -1673,6 +1675,7 @@ bgp_attr_ext_communities (struct bgp_attr_parser_args *args)
 }
 
 /* BGP unknown attribute treatment. */
+//P deal with unknown attr's
 static bgp_attr_parse_ret_t
 bgp_attr_unknown (struct bgp_attr_parser_args *args)
 {
@@ -1680,8 +1683,8 @@ bgp_attr_unknown (struct bgp_attr_parser_args *args)
   struct transit *transit;
   struct attr_extra *attre;
   struct peer *const peer = args->peer; 
-  struct attr *const attr = args->attr;
-  u_char *const startp = args->startp;
+  struct attr *const attr = args->attr; //P the attr
+  u_char *const startp = args->startp; //P combined w/ length, contains the attribute's bytes
   const u_char type = args->type;
   const u_char flag = args->flags;  
   const bgp_size_t length = args->length;
@@ -1711,29 +1714,39 @@ bgp_attr_unknown (struct bgp_attr_parser_args *args)
 
   /* Unrecognized non-transitive optional attributes must be quietly
      ignored and not passed along to other BGP peers. */
+  //P silently ignore all non-transitive optional attributes
   if (! CHECK_FLAG (flag, BGP_ATTR_FLAG_TRANS))
     return BGP_ATTR_PARSE_PROCEED;
+
+  //P at this point, it must be an unrecognized, optional, transitive attribute
 
   /* If a path with recognized transitive optional attribute is
      accepted and passed along to other BGP peers and the Partial bit
      in the Attribute Flags octet is set to 1 by some previous AS, it
      is not set back to 0 by the current AS. */
+  //P set partial flag to 1 to signify that not all ASes on the path recognized this attribute
   SET_FLAG (*startp, BGP_ATTR_FLAG_PARTIAL);
 
   /* Store transitive attribute to the end of attr->transit. */
+  //P alloc needed memory, if needed
   if (! ((attre = bgp_attr_extra_get(attr))->transit) )
       attre->transit = XCALLOC (MTYPE_TRANSIT, sizeof (struct transit));
 
+  //P we are watching (attr->extra->)transit->val+length
   transit = attre->transit;
 
+  // realloc transit->val to have enough space
   if (transit->val)
     transit->val = XREALLOC (MTYPE_TRANSIT_VAL, transit->val, 
 			     transit->length + total);
   else
     transit->val = XMALLOC (MTYPE_TRANSIT_VAL, total);
 
+  // copy the transitive attribute in byte-for-byte
   memcpy (transit->val + transit->length, startp, total);
   transit->length += total;
+
+  //P this is where the attribute deserialization can go
 
   return BGP_ATTR_PARSE_PROCEED;
 }
@@ -1790,6 +1803,7 @@ bgp_attr_check (struct peer *peer, struct attr *attr)
 
 /* Read attribute of update packet.  This function is called from
    bgp_update_receive() in bgp_packet.c.  */
+//P this function parses update packet attributes
 bgp_attr_parse_ret_t
 bgp_attr_parse (struct peer *peer, struct attr *attr, bgp_size_t size,
 		struct bgp_nlri *mp_update, struct bgp_nlri *mp_withdraw)
@@ -1814,6 +1828,7 @@ bgp_attr_parse (struct peer *peer, struct attr *attr, bgp_size_t size,
   endp = BGP_INPUT_PNT (peer) + size;
   
   /* Get attributes to the end of attribute length. */
+  //P loop over each attribute available
   while (BGP_INPUT_PNT (peer) < endp)
     {
       /* Check remaining length check.*/
@@ -1836,6 +1851,7 @@ bgp_attr_parse (struct peer *peer, struct attr *attr, bgp_size_t size,
       /* "The lower-order four bits of the Attribute Flags octet are
          unused.  They MUST be zero when sent and MUST be ignored when
          received." */
+      //P read the attribute flags
       flag = 0xF0 & stream_getc (BGP_INPUT (peer));
       type = stream_getc (BGP_INPUT (peer));
 
@@ -1854,7 +1870,8 @@ bgp_attr_parse (struct peer *peer, struct attr *attr, bgp_size_t size,
 	  return BGP_ATTR_PARSE_ERROR;
 	}
       
-      /* Check extended attribue length bit. */
+      /* Check extended attribute length bit. */
+      //P read the BGP attribute
       if (CHECK_FLAG (flag, BGP_ATTR_FLAG_EXTLEN))
 	length = stream_getw (BGP_INPUT (peer));
       else
@@ -1920,6 +1937,7 @@ bgp_attr_parse (struct peer *peer, struct attr *attr, bgp_size_t size,
           return ret;
         }
 
+      //P This is where we might add our extra data
       /* OK check attribute and store it's value. */
       switch (type)
 	{
@@ -1983,7 +2001,7 @@ bgp_attr_parse (struct peer *peer, struct attr *attr, bgp_size_t size,
 	  ret = BGP_ATTR_PARSE_ERROR;
 	}
 
-      /* If hard error occured immediately return to the caller. */
+      /* If hard error occurred immediately return to the caller. */
       if (ret == BGP_ATTR_PARSE_ERROR)
         {
           zlog (peer->log, LOG_WARNING,
@@ -2103,6 +2121,7 @@ bgp_attr_parse (struct peer *peer, struct attr *attr, bgp_size_t size,
     }
 
   /* Finally intern unknown attribute. */
+  //P dedup references to this attribute
   if (attr->extra && attr->extra->transit)
     attr->extra->transit = transit_intern (attr->extra->transit);
 
@@ -2205,6 +2224,7 @@ bgp_packet_mpattr_end (struct stream *s, size_t sizep)
 }
 
 /* Make attribute packet. */
+//P this function serializes the attributes into the packet's stream
 bgp_size_t
 bgp_packet_attribute (struct bgp *bgp, struct peer *peer,
 		      struct stream *s, struct attr *attr,
@@ -2553,7 +2573,10 @@ bgp_packet_attribute (struct bgp *bgp, struct peer *peer,
       stream_put_ipv4 (s, attr->extra->aggregator_addr.s_addr);
     }
   
+  //P here is where we can add our own transitive attributes
+
   /* Unknown transit attribute. */
+  //P serialization of unknown transit attributes here
   if (attr->extra && attr->extra->transit)
     stream_put (s, attr->extra->transit->val, attr->extra->transit->length);
 

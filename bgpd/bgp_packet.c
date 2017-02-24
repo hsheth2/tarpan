@@ -138,6 +138,7 @@ bgp_connect_check (struct peer *peer)
 }
 
 /* Make BGP update packet.  */
+//P here we send a packet
 static struct stream *
 bgp_update_packet (struct peer *peer, afi_t afi, safi_t safi)
 {
@@ -160,6 +161,7 @@ bgp_update_packet (struct peer *peer, afi_t afi, safi_t safi)
 
   adv = BGP_ADV_FIFO_HEAD (&peer->sync[afi][safi]->update);
 
+  //P put in as many advertisements as possible into the packet
   while (adv)
     {
       assert (adv->rn);
@@ -187,6 +189,7 @@ bgp_update_packet (struct peer *peer, afi_t afi, safi_t safi)
 	  bgp_packet_set_marker (s, BGP_MSG_UPDATE);
 
 	  /* 2: withdrawn routes length */
+	  //P will send only new routes; withdraws are done in bgp_withdraw_packet
 	  stream_putw (s, 0);
 
 	  /* 3: total attributes length - attrlen_pos stores the position */
@@ -234,7 +237,7 @@ bgp_update_packet (struct peer *peer, afi_t afi, safi_t safi)
                 rn->p.prefixlen);
         }
 
-      /* Synchnorize attribute.  */
+      /* Synchronize attribute.  */
       if (adj->attr)
 	bgp_attr_unintern (&adj->attr);
       else
@@ -243,7 +246,7 @@ bgp_update_packet (struct peer *peer, afi_t afi, safi_t safi)
       adj->attr = bgp_attr_intern (adv->baa->attr);
 
       adv = bgp_advertise_clean (peer, adj, afi, safi);
-    }
+    } // end while loop
 
   if (! stream_empty (s))
     {
@@ -256,6 +259,7 @@ bgp_update_packet (struct peer *peer, afi_t afi, safi_t safi)
       /* set the total attribute length correctly */
       stream_putw_at (s, attrlen_pos, total_attr_len);
 
+      //P merge the start of the packet with the NLRI information stream to form the overall packet
       if (!stream_empty(snlri))
 	packet = stream_dupcat(s, snlri, mpattr_pos);
       else
@@ -919,7 +923,7 @@ bgp_open_send (struct peer *peer)
   BGP_WRITE_ON (peer->t_write, bgp_write, peer->fd);
 }
 
-/* Send BGP notify packet with data potion. */
+/* Send BGP notify packet with data portion. */
 void
 bgp_notify_send_with_data (struct peer *peer, u_char code, u_char sub_code,
 			   u_char *data, size_t datalen)
@@ -1597,6 +1601,7 @@ bgp_open_receive (struct peer *peer, bgp_size_t size)
 }
 
 /* Parse BGP Update packet and make attribute object. */
+//P BGP packet receive routine + parsing
 static int
 bgp_update_receive (struct peer *peer, bgp_size_t size)
 {
@@ -1629,10 +1634,16 @@ bgp_update_receive (struct peer *peer, bgp_size_t size)
   memset (&withdraw, 0, sizeof (struct bgp_nlri));
   memset (&mp_update, 0, sizeof (struct bgp_nlri));
   memset (&mp_withdraw, 0, sizeof (struct bgp_nlri));
-  attr.extra = &extra;
+  attr.extra = &extra; //P attr extra
 
   s = peer->ibuf;
   end = stream_pnt (s) + size;
+
+  /*
+   * ###
+   * ERROR CHECKING
+   * ###
+   */
 
   /* RFC1771 6.3 If the Unfeasible Routes Length or Total Attribute
      Length is too large (i.e., if Unfeasible Routes Length + Total
@@ -1704,6 +1715,12 @@ bgp_update_receive (struct peer *peer, bgp_size_t size)
       return -1;
     }
   
+  /*
+   * ###
+   * END ERROR CHECK
+   * ###
+   */
+
   /* Certain attribute parsing errors should not be considered bad enough
    * to reset the session for, most particularly any partial/optional
    * attributes that have 'tunneled' over speakers that don't understand
@@ -1712,6 +1729,8 @@ bgp_update_receive (struct peer *peer, bgp_size_t size)
    * Complicates the flow a little though..
    */
   bgp_attr_parse_ret_t attr_parse_ret = BGP_ATTR_PARSE_PROCEED;
+  //P BGP_ATTR_PARSE_ERROR is a "hard attr parse error", while BGP_ATTR_PARSE_WITHDRAW \
+  //  will force the BGP implementation to simple withdraw the prefix concerned
   /* This define morphs the update case into a withdraw when lower levels
    * have signalled an error condition where this is best.
    */
@@ -1730,6 +1749,7 @@ bgp_update_receive (struct peer *peer, bgp_size_t size)
     }
   
   /* Logging the attribute. */
+  //P only run when debugging or bgp_attr_parse returns "withdraw"
   if (attr_parse_ret == BGP_ATTR_PARSE_WITHDRAW
       || BGP_DEBUG (update, UPDATE_IN))
     {
@@ -1920,6 +1940,7 @@ bgp_update_receive (struct peer *peer, bgp_size_t size)
 
   /* Everything is done.  We unintern temporary structures which
      interned in bgp_attr_parse(). */
+  //P free the attr structure
   bgp_attr_unintern_sub (&attr);
 
   /* If peering is stopped due to some reason, do not generate BGP

@@ -3165,6 +3165,7 @@ bgp_nlri_parse (struct peer *peer, struct attr *attr, struct bgp_nlri *packet)
 #endif /* HAVE_IPV6 */
 
       /* Normal process. */
+      //P this is where the BGP update or withdraw is actually processed
       if (attr)
 	ret = bgp_update (peer, &p, attr, packet->afi, packet->safi, 
 			  ZEBRA_ROUTE_BGP, BGP_ROUTE_NORMAL, NULL, NULL, 0);
