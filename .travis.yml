@@ -14,6 +14,11 @@ install:
   # - automake --gnu --add-missing --copy
 
 script:
-  - ./configure --enable-vtysh --disable-ripd --disable-ripngd --disable-ospfd --disable-ospf6d --disable-babeld --disable-isisd --disable-opaque-lsa --disable-ospfclient --disable-ospf-te
+  - ./configure --disable-doc --enable-vtysh --disable-ripd --disable-ripngd --disable-ospfd --disable-ospf6d --disable-babeld --disable-isisd --disable-opaque-lsa --disable-ospfclient --disable-ospf-te
   - make
   - sudo make install
+
+notifications:
+  email:
+    - hsheth2@gmail.com
+    - me@andrewsun.com
