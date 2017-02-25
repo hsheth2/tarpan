@@ -280,7 +280,7 @@ tarpan_hash_alloc (void *p)
   struct tarpan* t = p;
   struct tarpan* new_tarpan = bgp_tarpan_new();
 
-  (*new_tarpan) = t;
+  (*new_tarpan) = *t;
 
   return (void*)new_tarpan;
 }
@@ -291,7 +291,7 @@ tarpan_intern(struct tarpan* tarpan)
   struct tarpan *find;
   find = hash_get(tarpan_hash, tarpan, tarpan_hash_alloc);
   if (find != tarpan)
-    tarpan_free(tarpan);
+    bgp_tarpan_free(tarpan);
 
   find->refcnt++;
 
@@ -1787,7 +1787,7 @@ bgp_attr_tarpan(struct bgp_attr_parser_args *args) {
   u_char *const startp = args->startp; //P combined w/ length, contains the attribute's bytes
   const bgp_size_t length = args->length;
 
-  struct transit *transit;
+  struct tarpan *tarpan;
 
   struct attr_extra *attre;
 
@@ -1801,14 +1801,16 @@ bgp_attr_tarpan(struct bgp_attr_parser_args *args) {
                                  args->total);
     }
 
-  u_int32_t tarpan = stream_getl(peer->ibuf);
-  zlog(peer->log, LOG_INFO, "YAY TARPAN %d", tarpan);
+  tarpan = bgp_tarpan_get(attr);
 
-  attr->tarpan = tarpan;
+  u_int32_t t1 = stream_getl(peer->ibuf);
+  zlog(peer->log, LOG_INFO, "YAY TARPAN %d", t1);
 
-//  if (! ((attre = bgp_attr_extra_get(attr))->transit) )
-//      attre->transit = XCALLOC (MTYPE_TRANSIT, sizeof (struct transit));
-//
+  tarpan->test1 = t1;
+  tarpan->test2 = t1;
+  tarpan->test3 = t1;
+
+
 //  //P we are watching (attr->extra->)transit->val+length
 //  transit = attre->transit;
 //
