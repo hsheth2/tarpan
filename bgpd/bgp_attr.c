@@ -281,9 +281,7 @@ tarpan_hash_alloc (void *p)
 
   (*new_tarpan) = *p;
 
-
-
-  return new_tarpan;
+  return (void*)new_tarpan;
 }
 
 static struct tarpan*
