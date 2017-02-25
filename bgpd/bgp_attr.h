@@ -91,7 +91,9 @@ struct attr_extra
 struct tarpan
 {
   unsigned long refcnt;
-  u_int32_t test; // test data for now
+  u_int32_t test1; // test data for now
+  u_int32_t test2;
+  u_int32_t test3;
 };
 
 /* BGP core attribute structure. */
@@ -181,6 +183,18 @@ extern unsigned int attrhash_key_make (void *);
 extern void attr_show_all (struct vty *);
 extern unsigned long int attr_count (void);
 extern unsigned long int attr_unknown_count (void);
+
+extern static void * tarpan_hash_alloc (void *p);
+extern static struct tarpan* tarpan_intern(struct tarpan* tarpan);
+extern void tarpan_unintern(struct tarpan *tarpan);
+extern static unsigned int tarpan_hash_key_make(void *p);
+extern static int tarpan_hash_cmp(const void *p1, const void *p2);
+extern static void tarpan_init(void);
+extern static void tarpan_finish(void);
+extern struct tarpan* bgp_tarpan_new (void);
+extern void bgp_tarpan_free (struct attr *attr);
+extern struct tarpan * bgp_tarpan_get(struct attr *attr);
+
 
 /* Cluster list prototypes. */
 extern int cluster_loop_check (struct cluster_list *, struct in_addr);

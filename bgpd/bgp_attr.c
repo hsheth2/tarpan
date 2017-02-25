@@ -281,6 +281,8 @@ tarpan_hash_alloc (void *p)
 
   (*new_tarpan) = *p;
 
+
+
   return new_tarpan;
 }
 
@@ -308,17 +310,33 @@ void tarpan_unintern(struct tarpan *tarpan)
     }
 }
 
+
+
 static unsigned int
 tarpan_hash_key_make(void *p)
 {
   const struct tarpan * tarpan = p;
-  return jhash(tarpan->refcnt, sizeof(tarpan->refcnt), 0);
+  size_t sizeof_tarpan_refcnt = sizeof(tarpan->refcnt);
+  return jhash(tarpan + sizeof_tarpan_refcnt, sizeof(tarpan) - sizeof_tarpan_refcnt, 0);
 }
 
 static int
-transit_hash_cmp(const void *p1, const void *p2)
+tarpan_hash_cmp(const void *p1, const void *p2)
 {
   return tarpan_hash_key_make(p1) == tarpan_hash_key_make(p2);
+}
+
+static void
+tarpan_init(void)
+{
+  tarpan_hash = hash_create(tarpan_hash_key_make, tarpan_hash_cmp);
+}
+
+static void
+tarpan_finish(void)
+{
+  hash_free(tarpan_hash);
+  tarpan_hash = NULL;
 }
 
 static void
@@ -2779,6 +2797,7 @@ bgp_attr_init (void)
   ecommunity_init ();
   cluster_init ();
   transit_init ();
+  tarpan_init();
 }
 
 void
@@ -2790,6 +2809,7 @@ bgp_attr_finish (void)
   ecommunity_finish ();
   cluster_finish ();
   transit_finish ();
+  tarpan_finish();
 }
 
 /* Make attribute packet. */
