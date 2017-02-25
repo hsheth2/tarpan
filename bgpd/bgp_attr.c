@@ -1674,6 +1674,30 @@ bgp_attr_ext_communities (struct bgp_attr_parser_args *args)
   return BGP_ATTR_PARSE_PROCEED;
 }
 
+/* Tarpan attribute */
+static bgp_attr_parse_ret_t
+bgp_attr_tarpan(struct bgp_attr_parser_args *args) {
+  struct peer *const peer = args->peer;
+  struct attr *const attr = args->attr;
+  const bgp_size_t length = args->length;
+
+  if (length != 4)
+    {
+      zlog (peer->log, LOG_ERR,
+	    "Tarpan attribute length is incorrect [%d]", length);
+
+      return bgp_attr_malformed (args,
+                                 BGP_NOTIFY_UPDATE_ATTR_LENG_ERR,
+                                 args->total);
+    }
+
+  uint32_t tarpan = stream_getl(peer->ibuf);
+  zlog(peer->log, LOG_INFO, "YAY TARPAN %d", tarpan);
+
+
+  return BGP_ATTR_PARSE_PROCEED;
+}
+
 /* BGP unknown attribute treatment. */
 //P deal with unknown attr's
 static bgp_attr_parse_ret_t
@@ -1988,6 +2012,8 @@ bgp_attr_parse (struct peer *peer, struct attr *attr, bgp_size_t size,
 	case BGP_ATTR_EXT_COMMUNITIES:
 	  ret = bgp_attr_ext_communities (&attr_args);
 	  break;
+	case BGP_ATTR_TARPAN:
+	  ret =
 	default:
 	  ret = bgp_attr_unknown (&attr_args);
 	  break;
