@@ -2013,7 +2013,8 @@ bgp_attr_parse (struct peer *peer, struct attr *attr, bgp_size_t size,
 	  ret = bgp_attr_ext_communities (&attr_args);
 	  break;
 	case BGP_ATTR_TARPAN:
-	  ret =
+	  ret = bgp_attr_tarpan(&attr_args);
+	  break;
 	default:
 	  ret = bgp_attr_unknown (&attr_args);
 	  break;
