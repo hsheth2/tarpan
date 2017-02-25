@@ -152,6 +152,9 @@ struct memory_list memory_list_bgp[] =
   { MTYPE_BGP_REGEXP,		"BGP regexp"			},
   { MTYPE_BGP_AGGREGATE,	"BGP aggregate"			},
   { MTYPE_BGP_ADDR,		"BGP own address"		},
+  { 0, NULL },
+  { MTYPE_BGP_TARPAN, 		"BGP Tarpan data"		},
+
   { -1, NULL }
 };
 

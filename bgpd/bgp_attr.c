@@ -271,6 +271,56 @@ transit_hash_cmp (const void *p1, const void *p2)
 	  memcmp (transit1->val, transit2->val, transit1->length) == 0);
 }
 
+/* Tarpan attribute. */
+static struct hash *tarpan_hash;
+
+static void *
+tarpan_hash_alloc (void *p)
+{
+  struct tarpan* new_tarpan = bgp_tarpan_new();
+
+  (*new_tarpan) = *p;
+
+  return new_tarpan;
+}
+
+static struct tarpan*
+tarpan_intern(struct tarpan* tarpan)
+{
+  struct tarpan *find;
+  find = hash_get(tarpan_hash, tarpan, tarpan_hash_alloc);
+  if (find != tarpan)
+    tarpan_free(tarpan);
+
+  find->refcnt++;
+
+  return find;
+}
+
+void tarpan_unintern(struct tarpan *tarpan)
+{
+  if (tarpan->refcnt)
+    tarpan->refcnt--;
+  if (tarpan->refcnt == 0)
+    {
+      hash_release(tarpan_hash, tarpan);
+      tarpan_free(tarpan);
+    }
+}
+
+static unsigned int
+tarpan_hash_key_make(void *p)
+{
+  const struct tarpan * tarpan = p;
+  return jhash(tarpan->refcnt, sizeof(tarpan->refcnt), 0);
+}
+
+static int
+transit_hash_cmp(const void *p1, const void *p2)
+{
+  return tarpan_hash_key_make(p1) == tarpan_hash_key_make(p2);
+}
+
 static void
 transit_init (void)
 {
@@ -310,6 +360,30 @@ bgp_attr_extra_get (struct attr *attr)
   if (!attr->extra)
     attr->extra = bgp_attr_extra_new();
   return attr->extra;
+}
+
+struct tarpan*
+bgp_tarpan_new (void)
+{
+  return XCALLOC(MTYPE_BGP_TARPAN, sizeof (struct tarpan));
+}
+
+void
+bgp_tarpan_free (struct attr *attr)
+{
+  if (attr->tarpan)
+    {
+      XFREE(MTYPE_BGP_TARPAN, attr->tarpan);
+      attr->tarpan = NULL;
+    }
+}
+
+struct tarpan *
+bgp_tarpan_get(struct attr *attr)
+{
+  if (!attr->tarpan)
+    attr->tarpan = bgp_tarpan_new();
+  return attr->tarpan;
 }
 
 /* Shallow copy of an attribute
@@ -493,6 +567,12 @@ bgp_attr_hash_alloc (void *p)
       attr->extra = bgp_attr_extra_new ();
       *attr->extra = *val->extra;
     }
+  if (val->tarpan)
+    {
+      attr->tarpan = bgp_tarpan_new();
+      *attr->tarpan = *val->tarpan;
+    }
+
   attr->refcnt = 0;
   return attr;
 }
@@ -544,6 +624,13 @@ bgp_attr_intern (struct attr *attr)
           else
             attre->transit->refcnt++;
         }
+    }
+  if (attr->tarpan)
+    {
+      if (!attr->tarpan->refcnt)
+	attr->tarpan = tarpan_intern(attr->tarpan);
+      else
+	attr->tarpan->refcnt++;
     }
   
   find = (struct attr *) hash_get (attrhash, attr, bgp_attr_hash_alloc);
@@ -1697,27 +1784,29 @@ bgp_attr_tarpan(struct bgp_attr_parser_args *args) {
                                  args->total);
     }
 
-  uint32_t tarpan = stream_getl(peer->ibuf);
+  u_int32_t tarpan = stream_getl(peer->ibuf);
   zlog(peer->log, LOG_INFO, "YAY TARPAN %d", tarpan);
 
-  if (! ((attre = bgp_attr_extra_get(attr))->transit) )
-      attre->transit = XCALLOC (MTYPE_TRANSIT, sizeof (struct transit));
+  attr->tarpan = tarpan;
 
-  //P we are watching (attr->extra->)transit->val+length
-  transit = attre->transit;
+//  if (! ((attre = bgp_attr_extra_get(attr))->transit) )
+//      attre->transit = XCALLOC (MTYPE_TRANSIT, sizeof (struct transit));
+//
+//  //P we are watching (attr->extra->)transit->val+length
+//  transit = attre->transit;
+//
+//  // realloc transit->val to have enough space
+//  if (transit->val)
+//    transit->val = XREALLOC (MTYPE_TRANSIT_VAL, transit->val,
+//			     transit->length + total);
+//  else
+//    transit->val = XMALLOC (MTYPE_TRANSIT_VAL, total);
+//
+//  // copy the transitive attribute in byte-for-byte
+//  memcpy (transit->val + transit->length, startp, total);
+//  transit->length += total;
 
-  // realloc transit->val to have enough space
-  if (transit->val)
-    transit->val = XREALLOC (MTYPE_TRANSIT_VAL, transit->val,
-			     transit->length + total);
-  else
-    transit->val = XMALLOC (MTYPE_TRANSIT_VAL, total);
 
-  // copy the transitive attribute in byte-for-byte
-  memcpy (transit->val + transit->length, startp, total);
-  transit->length += total;
-
-  //P this is where the attribute deserialization can go
 
   return BGP_ATTR_PARSE_PROCEED;
 }

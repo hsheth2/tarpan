@@ -87,6 +87,13 @@ struct attr_extra
   u_char mp_nexthop_len;
 };
 
+// holds data for tarpan
+struct tarpan
+{
+  unsigned long refcnt;
+  u_int32_t test; // test data for now
+};
+
 /* BGP core attribute structure. */
 struct attr
 {
@@ -112,6 +119,9 @@ struct attr
   
   /* Path origin attribute */
   u_char origin;
+
+  // our tarpan data
+  struct tarpan *tarpan;
 };
 
 /* Router Reflector related structure. */
