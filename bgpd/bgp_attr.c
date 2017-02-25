@@ -1677,9 +1677,15 @@ bgp_attr_ext_communities (struct bgp_attr_parser_args *args)
 /* Tarpan attribute */
 static bgp_attr_parse_ret_t
 bgp_attr_tarpan(struct bgp_attr_parser_args *args) {
+  bgp_size_t total = args->total;
   struct peer *const peer = args->peer;
   struct attr *const attr = args->attr;
+  u_char *const startp = args->startp; //P combined w/ length, contains the attribute's bytes
   const bgp_size_t length = args->length;
+
+  struct transit *transit;
+
+  struct attr_extra *attre;
 
   if (length != 4)
     {
@@ -1694,6 +1700,24 @@ bgp_attr_tarpan(struct bgp_attr_parser_args *args) {
   uint32_t tarpan = stream_getl(peer->ibuf);
   zlog(peer->log, LOG_INFO, "YAY TARPAN %d", tarpan);
 
+  if (! ((attre = bgp_attr_extra_get(attr))->transit) )
+      attre->transit = XCALLOC (MTYPE_TRANSIT, sizeof (struct transit));
+
+  //P we are watching (attr->extra->)transit->val+length
+  transit = attre->transit;
+
+  // realloc transit->val to have enough space
+  if (transit->val)
+    transit->val = XREALLOC (MTYPE_TRANSIT_VAL, transit->val,
+			     transit->length + total);
+  else
+    transit->val = XMALLOC (MTYPE_TRANSIT_VAL, total);
+
+  // copy the transitive attribute in byte-for-byte
+  memcpy (transit->val + transit->length, startp, total);
+  transit->length += total;
+
+  //P this is where the attribute deserialization can go
 
   return BGP_ATTR_PARSE_PROCEED;
 }
