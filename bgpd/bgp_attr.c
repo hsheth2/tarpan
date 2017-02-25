@@ -277,9 +277,10 @@ static struct hash *tarpan_hash;
 static void *
 tarpan_hash_alloc (void *p)
 {
+  struct tarpan* t = p;
   struct tarpan* new_tarpan = bgp_tarpan_new();
 
-  (*new_tarpan) = *p;
+  (*new_tarpan) = t;
 
   return (void*)new_tarpan;
 }
