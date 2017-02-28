@@ -1750,6 +1750,8 @@ bgp_attr_unknown (struct bgp_attr_parser_args *args)
   if (args->type == BGP_ATTR_TARPAN)
     {
       // TODO: any special code to handle tarpan data (possibly set a bool?)
+      zlog_info ("%s tarpan attribute is received (length %d)",
+      	      peer->host, length);
     }
 
   return BGP_ATTR_PARSE_PROCEED;
