@@ -1746,7 +1746,11 @@ bgp_attr_unknown (struct bgp_attr_parser_args *args)
   memcpy (transit->val + transit->length, startp, total);
   transit->length += total;
 
-  //P this is where the attribute deserialization can go
+  // special case for tarpan data
+  if (args->type == BGP_ATTR_TARPAN)
+    {
+      // TODO: any special code to handle tarpan data (possibly set a bool?)
+    }
 
   return BGP_ATTR_PARSE_PROCEED;
 }
