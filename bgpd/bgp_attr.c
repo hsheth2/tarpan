@@ -2223,6 +2223,52 @@ bgp_packet_mpattr_prefix (struct stream *s, afi_t afi, safi_t safi,
     }
 }
 
+struct bgp_tarpan_find_ptr_ret bgp_tarpan_find_ptr(struct transit* t)
+{
+  u_char* curr = t.val;
+
+  while (curr < t.val + t.length)
+    {
+      u_char flags = *curr;
+      curr++;
+
+      u_char type = *curr;
+      curr++;
+
+      u_int16_t len;
+
+      if (CHECK_FLAG(flags, BGP_ATTR_FLAG_EXTLEN))
+	{
+	  len = *((u_int16_t*) curr);
+	  curr += 2;
+	}
+      else
+	{
+	  len = *curr;
+	  curr++;
+	}
+
+      if (type == BGP_ATTR_TARPAN)
+	{
+	  struct bgp_tarpan_find_ptr_ret ret;
+	  ret.len = len;
+	  ret.data = NULL;
+	  return ret;
+	}
+      else
+	{
+	  curr += len;
+	}
+
+    }
+
+  struct bgp_tarpan_find_ptr_ret ret;
+  ret.len = 0;
+  ret.data = NULL;
+
+  return ret;
+}
+
 void
 bgp_packet_mpattr_end (struct stream *s, size_t sizep)
 {

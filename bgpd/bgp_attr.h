@@ -132,6 +132,11 @@ struct transit
 
 #define ATTR_FLAG_BIT(X)  (1 << ((X) - 1))
 
+struct bgp_tarpan_find_ptr_ret {
+  u_int16_t len;
+  u_char* data;
+};
+
 typedef enum {
  BGP_ATTR_PARSE_PROCEED = 0,
  BGP_ATTR_PARSE_ERROR = -1,
