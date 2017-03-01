@@ -2225,9 +2225,9 @@ bgp_packet_mpattr_prefix (struct stream *s, afi_t afi, safi_t safi,
 
 struct bgp_tarpan_find_ptr_ret bgp_tarpan_find_ptr(struct transit* t)
 {
-  u_char* curr = t.val;
+  u_char* curr = t->val;
 
-  while (curr < t.val + t.length)
+  while (curr < t->val + t->length)
     {
       u_char flags = *curr;
       curr++;
