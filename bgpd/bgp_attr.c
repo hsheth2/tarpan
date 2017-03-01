@@ -2634,6 +2634,16 @@ bgp_packet_attribute (struct bgp *bgp, struct peer *peer,
   if (attr->extra && attr->extra->transit)
     stream_put (s, attr->extra->transit->val, attr->extra->transit->length);
 
+  struct bgp_tarpan_find_ptr_ret find = bgp_tarpan_find_ptr(attr->extra->transit);
+  if (find.data == NULL)
+    {
+      stream_putc(s, BGP_ATTR_FLAG_TRANS|BGP_ATTR_FLAG_OPTIONAL|BGP_ATTR_FLAG_EXTLEN);
+      stream_putc(s, BGP_ATTR_TARPAN);
+      stream_putw(s, 3);
+      stream_put(s, "Hi", 3);
+    }
+
+
   /* Return total size of attribute. */
   return stream_get_endp (s) - cp;
 }
