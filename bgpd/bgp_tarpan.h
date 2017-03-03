@@ -21,4 +21,24 @@ struct tarpan
   u_int32_t *val;
 };
 
+/* TODO Prototypes of tarpan attribute functions.  */
+extern void tarpan_init (void);
+extern void tarpan_finish (void);
+extern void tarpan_free (struct tarpan *);
+extern struct tarpan *tarpan_uniq_sort (struct tarpan *);
+extern struct tarpan *tarpan_parse (u_int32_t *, u_short);
+extern struct tarpan *tarpan_intern (struct tarpan *);
+extern void tarpan_unintern (struct tarpan **);
+extern char *tarpan_str (struct tarpan *);
+extern unsigned int tarpan_hash_make (struct tarpan *);
+extern int tarpan_match (const struct tarpan *, const struct tarpan *);
+extern int tarpan_cmp (const struct tarpan *, const struct tarpan *);
+extern struct tarpan *tarpan_merge (struct tarpan *, struct tarpan *);
+extern struct tarpan *tarpan_delete (struct tarpan *, struct tarpan *);
+extern struct tarpan *tarpan_dup (struct tarpan *);
+extern int tarpan_include (struct tarpan *, u_int32_t);
+extern void tarpan_del_val (struct tarpan *, u_int32_t *);
+extern unsigned long tarpan_count (void);
+extern struct hash *tarpan_hash (void);
+
 #endif /* _QUAGGA_BGP_TARPAN_H */
