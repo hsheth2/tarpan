@@ -134,6 +134,8 @@ struct memory_list memory_list_bgp[] =
   { MTYPE_COMMUNITY_LIST_CONFIG,  "community-list config"	},
   { MTYPE_COMMUNITY_LIST_HANDLER, "community-list handler"	},
   { 0, NULL },
+  { MTYPE_TARPAN,               "tarpan"			},
+  { 0, NULL },
   { MTYPE_CLUSTER,		"Cluster list"			},
   { MTYPE_CLUSTER_VAL,		"Cluster list val"		},
   { 0, NULL },
