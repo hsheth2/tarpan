@@ -206,6 +206,10 @@ bgp_dump_attr (struct peer *peer, struct attr *attr, char *buf, size_t size)
     snprintf (buf + strlen (buf), size - strlen (buf), ", community %s",
 	      community_str (attr->community));
 
+  if (CHECK_FLAG (attr->flag, ATTR_FLAG_BIT (BGP_ATTR_TARPAN)))
+      snprintf (buf + strlen (buf), size - strlen (buf), ", tarpan %s",
+  	      tarpan_str (attr->tarpan));
+
   if (CHECK_FLAG (attr->flag, ATTR_FLAG_BIT (BGP_ATTR_ATOMIC_AGGREGATE)))
     snprintf (buf + strlen (buf), size - strlen (buf), ", atomic-aggregate");
 

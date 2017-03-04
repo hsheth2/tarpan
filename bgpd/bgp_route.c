@@ -6106,6 +6106,8 @@ route_vty_out_detail (struct vty *vty, struct bgp *bgp, struct prefix *p,
 	  vty_out (vty, "%s", VTY_NEWLINE);
 	}
       
+      // TODO (tarpan) display tarpan structure data for vtysh
+
       if (binfo->extra && binfo->extra->damp_info)
 	bgp_damp_info_vty (vty, binfo);
 
@@ -6302,6 +6304,9 @@ bgp_show_table (struct vty *vty, struct bgp_table *table, struct in_addr *router
 		if (! community_list_exact_match (ri->attr->community, list))
 		  continue;
 	      }
+
+	    // TODO (tarpan) show tarpan data in the table
+
 	    if (type == bgp_show_type_flap_address
 		|| type == bgp_show_type_flap_prefix)
 	      {
