@@ -1752,7 +1752,7 @@ bgp_attr_unknown (struct bgp_attr_parser_args *args)
       // TODO: any special code to handle tarpan data (possibly set a bool?)
       zlog_info ("%s tarpan attribute is received (length %d)",
       	      peer->host, length);
-      zlog_info ("tarpan attribute has contents %s", args->startp); // TODO Fix buffer overflow
+      zlog_info ("tarpan attribute has contents %s", args->startp + 4); // TODO Fix buffer overflow
     }
 
   return BGP_ATTR_PARSE_PROCEED;
