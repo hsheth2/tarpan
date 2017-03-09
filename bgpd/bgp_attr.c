@@ -2266,11 +2266,13 @@ struct bgp_tarpan_find_ptr_ret bgp_tarpan_find_ptr(struct transit* t)
     }
 
 fail:
-  struct bgp_tarpan_find_ptr_ret ret;
-  ret.len = 0;
-  ret.data = NULL;
+  {
+    struct bgp_tarpan_find_ptr_ret ret;
+    ret.len = 0;
+    ret.data = NULL;
 
-  return ret;
+    return ret;
+  }
 }
 
 void
