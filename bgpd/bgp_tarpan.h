@@ -30,7 +30,7 @@ extern struct tarpan *tarpan_parse (u_int32_t *, u_short);
 extern struct tarpan *tarpan_intern (struct tarpan *); // TODO needed
 extern void tarpan_unintern (struct tarpan **); // TODO needed
 extern char *tarpan_str (struct tarpan *); // TODO needed for debugging
-extern unsigned int tarpan_hash_make (struct tarpan *); // TODO needed
+extern unsigned int tarpan_hash_make (struct tarpan *);
 extern int tarpan_match (const struct tarpan *, const struct tarpan *);
 extern int tarpan_cmp (const struct tarpan *, const struct tarpan *);
 extern struct tarpan *tarpan_merge (struct tarpan *, struct tarpan *);
