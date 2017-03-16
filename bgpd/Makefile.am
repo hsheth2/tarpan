@@ -10,9 +10,9 @@ AM_LDFLAGS = $(PILDFLAGS)
 noinst_LIBRARIES = libbgp.a
 sbin_PROGRAMS = bgpd
 
-BUILT_SOURCES += \
+BUILT_SOURCES = \
 	attr_tarpan.pb-c.c attr_tarpan.pb-c.h
-CLEANFILES += $(BUILT_SOURCES)
+CLEANFILES = $(BUILT_SOURCES)
 
 %.pb-c.c %.pb-c.h: %.proto
     protoc-c --c_out=. $^
