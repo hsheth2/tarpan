@@ -1,0 +1,13 @@
+#!/bin/bash
+
+mkdir -p /tmp/protobuf
+cd /tmp/protobuf
+
+# install protobuf
+wget https://github.com/google/protobuf/releases/download/v$PROTOBUF_VERSION/protobuf-$PROTOBUF_VERSION.tar.gz
+tar xf protobuf-$PROTOBUF_VERSION.tar.gz
+( cd protobuf-$PROTOBUF_VERSION && ./configure --prefix=$HOME/protobuf-$PROTOBUF_VERSION-bin && make -j2 && make install )
+
+# install protobuf-c
+git clone https://github.com/protobuf-c/protobuf-c
+( cd protobuf-c && ./autogen.sh && ./configure && make && make install )
