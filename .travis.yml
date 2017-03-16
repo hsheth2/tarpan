@@ -3,17 +3,12 @@ dist: precise
 
 language: cpp
 
-env:
-  global:
-    - PROTOBUF_VERSION=2.6.1
-    - PKG_CONFIG_PATH=$HOME/protobuf-$PROTOBUF_VERSION-bin/lib/pkgconfig
-
 before-install:
   - sudo apt-get -qq update
   - sudo apt-get install -y pkg-config gawk libreadline-dev autoconf automake bison byacc flex help2man texinfo libc-ares-dev 
-  - ./install-protobuf
 
 install: 
+  - ./install-protobuf
   - ./update-autotools
   - autoreconf --force
   # - libtoolize -c

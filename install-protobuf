@@ -1,4 +1,9 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+set -o xtrace
+
+export PROTOBUF_VERSION=2.6.1
+export PKG_CONFIG_PATH=$HOME/protobuf-$PROTOBUF_VERSION-bin/lib/pkgconfig
 
 mkdir -p /tmp/protobuf
 cd /tmp/protobuf
