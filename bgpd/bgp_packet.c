@@ -1729,8 +1729,7 @@ bgp_update_receive (struct peer *peer, bgp_size_t size)
    * Complicates the flow a little though..
    */
   bgp_attr_parse_ret_t attr_parse_ret = BGP_ATTR_PARSE_PROCEED;
-  //P BGP_ATTR_PARSE_ERROR is a "hard attr parse error", while BGP_ATTR_PARSE_WITHDRAW \
-  //  will force the BGP implementation to simple withdraw the prefix concerned
+  //P BGP_ATTR_PARSE_ERROR is a "hard attr parse error", while BGP_ATTR_PARSE_WITHDRAW will force the BGP implementation to simple withdraw the prefix concerned
   /* This define morphs the update case into a withdraw when lower levels
    * have signalled an error condition where this is best.
    */

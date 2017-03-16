@@ -35,6 +35,7 @@ Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 #include "bgpd/bgp_attr.h"
 #include "bgpd/bgp_debug.h"
 #include "bgpd/bgp_community.h"
+#include "bgpd/bgp_tarpan.h"
 
 unsigned long conf_bgp_debug_as4;
 unsigned long conf_bgp_debug_fsm;
