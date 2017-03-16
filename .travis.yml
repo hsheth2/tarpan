@@ -15,8 +15,7 @@ install:
 
 script:
   - ./configure --disable-doc --enable-vtysh --disable-ripd --disable-ripngd --disable-ospfd --disable-ospf6d --disable-babeld --disable-isisd --disable-opaque-lsa --disable-ospfclient --disable-ospf-te
-  - make
-  - sudo make install
+  - make && sudo make install
 
 notifications:
   email:
