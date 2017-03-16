@@ -1,0 +1,19 @@
+// works with only proto2
+
+message Wiser {
+	int32 a = 1;
+	int32 b = 2;
+}
+
+message Pathlets {
+	repeated int32 meow = 1;
+}
+
+message Tarpan {
+	// reserving tags 0-31 for internal use
+
+	optional Wiser wiser = 32;
+	optional Pathlets pathlets = 33;
+	// when other stuff is added, it is simply passes through
+	// each additional protocol will be assigned a number for use within this tarpan message
+}
