@@ -14,8 +14,8 @@ BUILT_SOURCES = \
 	attr_tarpan.pb-c.c attr_tarpan.pb-c.h
 CLEANFILES = $(BUILT_SOURCES)
 
-%.pb-c.c %.pb-c.h: %.proto
-    protoc-c --c_out=. $^
+attr_tarpan.pb-c.c attr_tarpan.pb-c.h: attr_tarpan.proto
+	@PROTOC_C@ --c_out=. attr_tarpan.proto
 
 libbgp_a_SOURCES = \
 	bgpd.c bgp_fsm.c bgp_aspath.c bgp_community.c bgp_attr.c \

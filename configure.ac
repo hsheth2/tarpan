@@ -1092,6 +1092,14 @@ dnl Protocol buffers for tarpan
 dnl ----------
 PKG_CHECK_MODULES([PROTOBUF_C], libprotobuf-c >= 1.0.0)
 
+AC_ARG_VAR([PROTOC_C], [protobuf-c compiler command])
+AC_PATH_PROG([PROTOC_C], [protoc-c], [],
+	     [`$PKG_CONFIG --variable=exec_prefix libprotobuf-c`/bin:$PATH])
+if test -z "$PROTOC_C"; then
+  AC_MSG_ERROR([Please install the protobuf-c compiler from https://github.com/protobuf-c/protobuf-c/.])
+fi
+
+
 dnl --------------------
 dnl Daemon disable check
 dnl --------------------
