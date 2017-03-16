@@ -9,8 +9,8 @@ before-install:
 
 install: 
   - ./install-protobuf
-  - ./update-autotools
-  - autoreconf --force
+  - autoreconf --force -v
+  # - ./update-autotools
   # - libtoolize -c
   # - automake --gnu --add-missing --copy
 
