@@ -10,9 +10,11 @@ AM_LDFLAGS = $(PILDFLAGS)
 noinst_LIBRARIES = libbgp.a
 sbin_PROGRAMS = bgpd
 
-dist_noinst_DATA = attr_tarpan.proto
+BUILT_SOURCES += \
+	attr_tarpan.pb-c.c attr_tarpan.pb-c.h
+CLEANFILES += $(BUILT_SOURCES)
 
-%.pb.cc %.pb.h: %.proto
+%.pb-c.c %.pb-c.h: %.proto
     protoc-c --c_out=. $^
 
 libbgp_a_SOURCES = \
@@ -37,5 +39,5 @@ bgpd_LDADD = libbgp.a ../lib/libzebra.la @LIBCAP@ @LIBM@
 examplesdir = $(exampledir)
 dist_examples_DATA = bgpd.conf.sample bgpd.conf.sample2
 
-EXTRA_DIST = BGP4-MIB.txt
+EXTRA_DIST = BGP4-MIB.txt attr_tarpan.proto
 
