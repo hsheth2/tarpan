@@ -1085,6 +1085,13 @@ else
   DOC="doc"
 fi
 
+dnl ----------
+dnl protobuf-c
+dnl
+dnl Protocol buffers for tarpan
+dnl ----------
+PKG_CHECK_MODULES([PROTOBUF_C], libprotobuf-c >= 1.0.0)
+
 dnl --------------------
 dnl Daemon disable check
 dnl --------------------

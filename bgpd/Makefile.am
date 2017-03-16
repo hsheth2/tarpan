@@ -10,6 +10,12 @@ AM_LDFLAGS = $(PILDFLAGS)
 noinst_LIBRARIES = libbgp.a
 sbin_PROGRAMS = bgpd
 
+dist_noinst_DATA = attr_tarpan.proto
+nodist_myprog_SOURCES = attr_tarpan.pb-c.c attr_tarpan.pb-c.h
+
+%.pb.cc %.pb.h: %.proto
+    protoc-c --c_out=. $^
+
 libbgp_a_SOURCES = \
 	bgpd.c bgp_fsm.c bgp_aspath.c bgp_community.c bgp_attr.c \
 	bgp_debug.c bgp_route.c bgp_zebra.c bgp_open.c bgp_routemap.c \
