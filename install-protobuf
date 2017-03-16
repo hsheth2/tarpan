@@ -15,4 +15,4 @@ tar xf protobuf-$PROTOBUF_VERSION.tar.gz
 
 # install protobuf-c
 git clone https://github.com/protobuf-c/protobuf-c
-( cd protobuf-c && ./autogen.sh && ./configure && make && make install )
+( cd protobuf-c && ./autogen.sh && ./configure && make && sudo make install )
