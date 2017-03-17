@@ -1,7 +1,9 @@
 
-# ignore protobuf-c
+# custom ignores
 *.pb-c.c
 *.pb-c.h
+Makefile
+.deps/
 
 # Created by https://www.gitignore.io/api/eclipse,windows,macos,linux,autotools,c
 
