@@ -1,5 +1,7 @@
 
 # custom ignores
+!Makefile.am
+!m4/README.txt
 *.pb-c.c
 *.pb-c.h
 Makefile
