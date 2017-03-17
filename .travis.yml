@@ -13,6 +13,7 @@ cache:
 
 install: 
   - ./install-protobuf
+  - automake --add-missing
   - autoreconf --force -v
   # - ./update-autotools
   # - libtoolize -c
