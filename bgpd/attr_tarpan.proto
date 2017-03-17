@@ -1,8 +1,8 @@
 // works with only proto2
 
 message Wiser {
-	int32 a = 1;
-	int32 b = 2;
+	required int32 a = 1;
+	required int32 b = 2;
 }
 
 message Pathlets {
