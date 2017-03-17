@@ -5,24 +5,22 @@ set -o xtrace
 export PROTOBUF_VERSION=2.6.1
 export PKG_CONFIG_PATH=$HOME/protobuf-$PROTOBUF_VERSION-bin/lib/pkgconfig
 
-if [ ! -d "$HOME/protobuf-build" ]; then
-	mkdir -p $HOME/protobuf-build
-	cd $HOME/protobuf-build
+mkdir -p $HOME/protobuf-build
+cd $HOME/protobuf-build
 
-	# install protobuf
+# install protobuf
+if [ ! -d "protobuf-$PROTOBUF_VERSION" ]; then
 	wget https://github.com/google/protobuf/releases/download/v$PROTOBUF_VERSION/protobuf-$PROTOBUF_VERSION.tar.gz
 	tar xf protobuf-$PROTOBUF_VERSION.tar.gz
-	( cd protobuf-$PROTOBUF_VERSION && ./configure --prefix=$HOME/protobuf-$PROTOBUF_VERSION-bin && make -j2 && make install )
-
-	# install protobuf-c
-	git clone https://github.com/protobuf-c/protobuf-c
-	( cd protobuf-c && ./autogen.sh && ./configure && make && sudo make install )
-else
-	cd $HOME/protobuf-build
-	
-	# install protobuf
-	( cd protobuf-$PROTOBUF_VERSION && make install )
-
-	# install protobuf-c
-	( cd protobuf-c && sudo make install )
+	( cd protobuf-$PROTOBUF_VERSION && ./configure --prefix=$HOME/protobuf-$PROTOBUF_VERSION-bin && make -j2 )
 fi
+( cd protobuf-$PROTOBUF_VERSION && make install )
+
+
+# install protobuf-c
+if [ ! -d "protobuf-c" ]; then
+	git clone https://github.com/protobuf-c/protobuf-c
+	( cd protobuf-c && ./autogen.sh && ./configure && make )
+fi
+( cd protobuf-c && sudo make install )
+
