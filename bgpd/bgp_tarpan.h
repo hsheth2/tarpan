@@ -17,14 +17,14 @@ struct tarpan
   unsigned long refcnt;
 
   /* tarpan value size.  */
-  int size;
+  int length;
 
   /* tarpan value */ // TODO(tarpan) only for now
   u_int32_t *val;
 };
 
 /* TODO(tarpan) Prototypes of tarpan attribute functions.  */
-extern void tarpan_init (void); // TODO needed
+extern void tarpan_init (void);
 extern void tarpan_finish (void); // TODO needed
 extern void tarpan_free (struct tarpan *); // TODO needed
 extern struct tarpan *tarpan_uniq_sort (struct tarpan *);
