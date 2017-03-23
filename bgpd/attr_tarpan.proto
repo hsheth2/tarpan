@@ -1,4 +1,6 @@
 // works with only proto2
+syntax = "proto2";
+
 
 message Wiser {
 	required int32 a = 1;
@@ -9,7 +11,7 @@ message Pathlets {
 	repeated int32 meow = 1;
 }
 
-message Tarpan {
+message TarpanMsg {
 	// reserving tags 0-31 for internal use
 
 	optional Wiser wiser = 32;

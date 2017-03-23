@@ -1695,6 +1695,33 @@ bgp_attr_ext_communities (struct bgp_attr_parser_args *args)
   return BGP_ATTR_PARSE_PROCEED;
 }
 
+/* Tarpan attribute */
+static bgp_attr_parse_ret_t
+bgp_tarpan_parse (struct bgp_attr_parser_args *args)
+{
+  struct peer *const peer = args->peer;
+  struct attr *const attr = args->attr;
+  const bgp_size_t length = args->length;
+
+  if (length == 0)
+    {
+      attr->tarpan = NULL;
+      return BGP_ATTR_PARSE_PROCEED;
+    }
+
+  attr->tarpan =
+    tarpan_parse ((u_int32_t *)stream_pnt (peer->ibuf), length);
+
+  if (!attr->tarpan)
+    return bgp_attr_malformed (args,
+                               BGP_NOTIFY_UPDATE_OPT_ATTR_ERR,
+                               args->total);
+
+  attr->flag |= ATTR_FLAG_BIT (BGP_ATTR_TARPAN);
+
+  return BGP_ATTR_PARSE_PROCEED;
+}
+
 /* BGP unknown attribute treatment. */
 //P deal with unknown attr's
 static bgp_attr_parse_ret_t
@@ -2010,7 +2037,8 @@ bgp_attr_parse (struct peer *peer, struct attr *attr, bgp_size_t size,
 	  ret = bgp_attr_ext_communities (&attr_args);
 	  break;
 	case BGP_ATTR_TARPAN:
-	  // TODO (tarpan) call a method
+	  // (tarpan) call a method
+	  ret = bgp_tarpan_parse(&attr_args);
 	  break;
 	default:
 	  ret = bgp_attr_unknown (&attr_args);
@@ -2443,7 +2471,14 @@ bgp_packet_attribute (struct bgp *bgp, struct peer *peer,
       stream_put (s, attr->community->val, attr->community->size * 4);
     }
 
-  // TODO (tarpan) here is where tarpan serialization should go
+  // (tarpan) here is where tarpan serialization is going
+  if (attr->flag & ATTR_FLAG_BIT (BGP_ATTR_TARPAN))
+    {
+      stream_putc (s, BGP_ATTR_FLAG_OPTIONAL|BGP_ATTR_FLAG_TRANS|BGP_ATTR_FLAG_EXTLEN);
+      stream_putc (s, BGP_ATTR_COMMUNITIES);
+      stream_putw (s, attr->tarpan->length);
+      stream_put(s, attr->tarpan->val, attr->tarpan->length);
+    }
 
   /* Route Reflector. */
   if (peer->sort == BGP_PEER_IBGP

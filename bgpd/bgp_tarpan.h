@@ -17,10 +17,12 @@ struct tarpan
   unsigned long refcnt;
 
   /* tarpan value size.  */
-  int length;
+  u_int16_t length;
 
   /* tarpan value */ // TODO(tarpan) only for now
   u_int32_t *val;
+
+  TarpanMsg deserialized = TARPAN_MSG__INIT;
 };
 
 /* TODO(tarpan) Prototypes of tarpan attribute functions.  */
@@ -28,7 +30,7 @@ extern void tarpan_init (void);
 extern void tarpan_finish (void); // TODO needed
 extern void tarpan_free (struct tarpan *); // TODO needed
 extern struct tarpan *tarpan_uniq_sort (struct tarpan *);
-extern struct tarpan *tarpan_parse (u_int32_t *, u_short);
+extern struct tarpan *tarpan_parse (u_int32_t *, u_short); // TODO needed, used in bgp_tarpan_parse
 extern struct tarpan *tarpan_intern (struct tarpan *); // TODO needed
 extern void tarpan_unintern (struct tarpan **); // TODO needed
 extern char *tarpan_str (struct tarpan *); // TODO only needed for debugging
