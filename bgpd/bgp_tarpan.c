@@ -146,7 +146,13 @@ tarpan_mark_modified (struct tarpan *tarp)
 void
 tarpan_reserialize (struct tarpan *tarp)
 {
-  // TODO reserialize
+  if (tarp->val)
+    tarpan_mark_modified(tarp);
+
+  // reserialize
+  tarp->length = tarpan_msg__get_packed_size(tarp->deserialized);
+  tarp->val = XMALLOC(MTYPE_BGP, tarp->length);
+  tarpan_msg__pack(tarp->deserialized, tarp->val);
 }
 
 char *

@@ -2480,6 +2480,7 @@ bgp_packet_attribute (struct bgp *bgp, struct peer *peer,
       void *buf;
       unsigned int len;
 
+      // TODO use reserialize method
       msg.version = 0;
       len = tarpan_msg__get_packed_size(&msg);
       buf = malloc(len);
