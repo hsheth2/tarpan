@@ -52,10 +52,10 @@ struct tarpan *
 tarpan_parse (u_int32_t *pnt, u_short length)
 {
   // TODO: work our protobuf magic
-  struct tarpan tmp;
+  struct tarpan* tmp = tarpan_new();
 
-  tmp.length = length;
-  tmp.val = pnt;
+  tmp->length = length;
+  tmp->val = pnt;
 
   TarpanMsg *msg = tarpan_msg__unpack(NULL, length, pnt);
   if (msg == NULL) {
@@ -63,9 +63,9 @@ tarpan_parse (u_int32_t *pnt, u_short length)
       abort();
   }
 
-  tmp.deserialized = msg;
+  tmp->deserialized = msg;
 
-  return tarpan_intern(&tmp);
+  return tarpan_intern(tmp);
 }
 
 static struct tarpan *
@@ -121,7 +121,7 @@ tarpan_unintern (struct tarpan **tarp)
   /* Pull off from hash.  */
   if ((*tarp)->refcnt == 0)
     {
-      /* Community value tarp must exist in hash. */
+      /* Tarpan value tarp must exist in hash. */
       ret = (struct tarp *) hash_release (tarpan_hash, *tarp);
       assert (ret != NULL);
 

@@ -25,7 +25,7 @@ struct tarpan
   TarpanMsg *deserialized;
 };
 
-/* TODO(tarpan) Prototypes of tarpan attribute functions.  */
+/* (tarpan) Prototypes of tarpan attribute functions.  */
 extern void tarpan_init (void);
 extern void tarpan_finish (void);
 extern void tarpan_free (struct tarpan *);
