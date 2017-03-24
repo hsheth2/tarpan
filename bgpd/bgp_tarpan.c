@@ -45,6 +45,35 @@ tarpan_cmp (const void *p1, const void *p2)
 	  memcmp (tarpan1->val, tarpan2->val, tarpan1->length) == 0);
 }
 
+struct tarpan *
+tarpan_parse (u_int32_t *pnt, u_short length)
+{
+  // TODO: work our protobuf magic
+  struct tarpan tmp;
+
+  tmp.length = length;
+  tmp.val = pnt;
+
+  return tarpan_intern(&tmp);
+}
+
+static struct tarpan *
+tarpan_new (void)
+{
+  return (struct tarpan *) XCALLOC (MTYPE_TARPAN,
+				       sizeof (struct tarpan));
+}
+
+void
+tarpan_free (struct tarpan *tarp)
+{
+  if (tarp->val)
+    XFREE (MTYPE_TARPAN, tarp->val);
+
+  XFREE (MTYPE_TARPAN, tarp);
+}
+
+
 void
 tarpan_init (void)
 {
