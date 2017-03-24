@@ -37,7 +37,7 @@ tarpan_hash_make (struct tarpan * tarpan)
 }
 
 int
-tarpan_cmp (const void *p1, const void *p2)
+tarpan_cmp (const struct tarpan *p1, const struct tarpan *p2)
 {
   const struct tarpan * tarpan1 = p1;
   const struct tarpan * tarpan2 = p2;
