@@ -2481,9 +2481,9 @@ bgp_packet_attribute (struct bgp *bgp, struct peer *peer,
       unsigned int len;
 
       msg.version = 0;
-      len = tarpan_msg__get_packed_size(msg);
+      len = tarpan_msg__get_packed_size(&msg);
       buf = malloc(len);
-      tarpan_msg__pack(msg, buf);
+      tarpan_msg__pack(&msg, buf);
 
       struct tarpan * tarp = tarpan_parse(buf, len);
 
