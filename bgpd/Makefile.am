@@ -6,7 +6,7 @@ INSTALL_SDATA=@INSTALL@ -m 600
 
 AM_CFLAGS = $(PICFLAGS)
 AM_LDFLAGS = $(PILDFLAGS)
-LDLIBS = -lprotobuf-c
+LDFLAGS = -lprotobuf -lprotobuf-c
 
 noinst_LIBRARIES = libbgp.a
 sbin_PROGRAMS = bgpd
@@ -35,7 +35,7 @@ noinst_HEADERS = \
 	bgp_tarpan.h attr_tarpan.pb-c.h
 
 bgpd_SOURCES = bgp_main.c
-bgpd_LDADD = libbgp.a ../lib/libzebra.la @LIBCAP@ @LIBM@
+bgpd_LDADD = libbgp.a ../lib/libzebra.la @LIBCAP@ @LIBM@ -lprotobuf-c
 
 examplesdir = $(exampledir)
 dist_examples_DATA = bgpd.conf.sample bgpd.conf.sample2
