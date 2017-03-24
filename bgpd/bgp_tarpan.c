@@ -74,6 +74,29 @@ tarpan_free (struct tarpan *tarp)
 }
 
 
+struct tarpan *
+tarpan_intern (struct tarpan *tarp)
+{
+  struct tarpan *find;
+
+  /* Assert this tarpan structure is not interned. */
+  assert (tarp->refcnt == 0);
+
+  /* Lookup tarpan hash. */
+  find = (struct tarpan *) hash_get (tarpan_hash, tarp, hash_alloc_intern);
+
+  /* Argument tarp is allocated temporary.  So when it is not used in
+     hash, it should be freed.  */
+  if (find != tarp)
+    tarpan_free(tarp);
+
+  /* Increment reference counter.  */
+  find->refcnt++;
+
+  return find;
+}
+
+
 void
 tarpan_init (void)
 {
