@@ -11,6 +11,7 @@
 #include "memory.h"
 
 #include "bgpd/bgp_tarpan.h"
+#include "bgpd/attr_tarpan.pb-c.h"
 
 static struct hash *tarpan_hash;
 
@@ -69,6 +70,9 @@ tarpan_free (struct tarpan *tarp)
 {
   if (tarp->val)
     XFREE (MTYPE_TARPAN, tarp->val);
+
+  if (tarp->deserialized)
+    tarpan_msg__free_unpacked(tarp->deserialized, NULL);
 
   XFREE (MTYPE_TARPAN, tarp);
 }
