@@ -132,6 +132,23 @@ tarpan_unintern (struct tarpan **tarp)
     }
 }
 
+void
+tarpan_mark_modified (struct tarpan *tarp)
+{
+  if (tarp->val)
+    {
+      XFREE (MTYPE_TARPAN, tarp->val);
+      tarp->val = NULL;
+      tarp->length = 0;
+    }
+}
+
+void
+tarpan_reserialize (struct tarpan *tarp)
+{
+  // TODO reserialize
+}
+
 char *
 tarpan_str (struct tarpan *tarp)
 {
