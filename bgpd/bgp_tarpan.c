@@ -13,6 +13,8 @@
 #include "bgpd/bgp_tarpan.h"
 #include "bgpd/attr_tarpan.pb-c.h"
 
+#include "log.h"
+
 static struct hash *tarpan_hash;
 
 /* Make hash value of tarpan attribute. This function is used by
