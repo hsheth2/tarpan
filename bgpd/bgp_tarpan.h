@@ -31,8 +31,8 @@ extern void tarpan_finish (void);
 extern void tarpan_free (struct tarpan *);
 extern struct tarpan *tarpan_uniq_sort (struct tarpan *);
 extern struct tarpan *tarpan_parse (u_int32_t *, u_short);
-extern struct tarpan *tarpan_intern (struct tarpan *); // TODO needed
-extern void tarpan_unintern (struct tarpan **); // TODO needed
+extern struct tarpan *tarpan_intern (struct tarpan *);
+extern void tarpan_unintern (struct tarpan **);
 extern char *tarpan_str (struct tarpan *); // TODO only needed for debugging
 extern unsigned int tarpan_hash_make (struct tarpan *);
 extern int tarpan_match (const struct tarpan *, const struct tarpan *);
