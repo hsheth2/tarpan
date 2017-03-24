@@ -22,7 +22,7 @@ struct tarpan
   /* tarpan value */ // TODO(tarpan) only for now
   u_int32_t *val;
 
-  TarpanMsg deserialized;
+  TarpanMsg *deserialized;
 };
 
 /* TODO(tarpan) Prototypes of tarpan attribute functions.  */

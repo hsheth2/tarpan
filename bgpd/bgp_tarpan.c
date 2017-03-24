@@ -54,6 +54,13 @@ tarpan_parse (u_int32_t *pnt, u_short length)
   tmp.length = length;
   tmp.val = pnt;
 
+  TarpanMsg *msg = tarpan_msg__unpack(NULL, length, pnt);
+  if (msg == NULL) {
+      abort("tarpan: AAAAAAAAAAAAAHHHHH");
+  }
+
+  tmp.deserialized = msg;
+
   return tarpan_intern(&tmp);
 }
 
