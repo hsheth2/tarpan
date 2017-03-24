@@ -96,6 +96,25 @@ tarpan_intern (struct tarpan *tarp)
   return find;
 }
 
+void
+tarpan_unintern (struct tarpan **tarp)
+{
+  struct tarpan *ret;
+
+  if ((*tarp)->refcnt)
+    (*tarp)->refcnt--;
+
+  /* Pull off from hash.  */
+  if ((*tarp)->refcnt == 0)
+    {
+      /* Community value tarp must exist in hash. */
+      ret = (struct tarp *) hash_release (tarpan_hash, *tarp);
+      assert (ret != NULL);
+
+      tarpan_free (*tarp);
+      *tarp = NULL;
+    }
+}
 
 void
 tarpan_init (void)
