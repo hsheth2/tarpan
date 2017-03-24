@@ -72,6 +72,8 @@ tarpan_parse (u_int32_t *pnt, u_short length)
 
   tmp->deserialized = msg;
 
+  zlog_info("Received tarpan packet, version %d", msg->version);
+
   return tarpan_intern(tmp);
 }
 

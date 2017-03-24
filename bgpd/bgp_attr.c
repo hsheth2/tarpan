@@ -2475,6 +2475,7 @@ bgp_packet_attribute (struct bgp *bgp, struct peer *peer,
   if (!(attr->flag & ATTR_FLAG_BIT (BGP_ATTR_TARPAN)))
     {
       // create a new tarpan attribute
+      zlog_info("Creating a new tarpan!");
       TarpanMsg msg = TARPAN_MSG__INIT;
       void *buf;
       unsigned int len;
@@ -2496,6 +2497,7 @@ bgp_packet_attribute (struct bgp *bgp, struct peer *peer,
   stream_putc (s, BGP_ATTR_COMMUNITIES);
   stream_putw (s, attr->tarpan->length);
   stream_put(s, attr->tarpan->val, attr->tarpan->length);
+  zlog_info("Sent tarpan!");
 
   /* Route Reflector. */
   if (peer->sort == BGP_PEER_IBGP
