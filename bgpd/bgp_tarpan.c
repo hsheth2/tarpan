@@ -50,3 +50,11 @@ tarpan_init (void)
 {
   tarpan_hash = hash_create (tarpan_hash_make /* TODO: vs. tarpan_hash_key_make??? */, tarpan_cmp);
 }
+
+void
+tarpan_finish (void)
+{
+  hash_free (tarpan_hash);
+  tarpan_hash = NULL;
+}
+
