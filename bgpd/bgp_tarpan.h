@@ -43,6 +43,6 @@ extern struct tarpan *tarpan_dup (struct tarpan *);
 extern int tarpan_include (struct tarpan *, u_int32_t);
 extern void tarpan_del_val (struct tarpan *, u_int32_t *);
 extern unsigned long tarpan_count (void);
-extern struct hash *tarpan_hash (void);
+//extern struct hash *tarpan_hash (void);
 
 #endif /* _QUAGGA_BGP_TARPAN_H */

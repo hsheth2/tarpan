@@ -57,7 +57,8 @@ tarpan_parse (u_int32_t *pnt, u_short length)
 
   TarpanMsg *msg = tarpan_msg__unpack(NULL, length, pnt);
   if (msg == NULL) {
-      abort("tarpan: AAAAAAAAAAAAAHHHHH");
+      zlog_err("tarpan: AAAAAAAAH!");
+      abort();
   }
 
   tmp.deserialized = msg;
