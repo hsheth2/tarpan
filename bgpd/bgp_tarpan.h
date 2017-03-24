@@ -27,7 +27,7 @@ struct tarpan
 
 /* TODO(tarpan) Prototypes of tarpan attribute functions.  */
 extern void tarpan_init (void);
-extern void tarpan_finish (void); // TODO needed
+extern void tarpan_finish (void);
 extern void tarpan_free (struct tarpan *);
 extern struct tarpan *tarpan_uniq_sort (struct tarpan *);
 extern struct tarpan *tarpan_parse (u_int32_t *, u_short);
