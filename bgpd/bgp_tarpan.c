@@ -17,6 +17,13 @@
 
 static struct hash *tarpan_hash;
 
+static struct tarpan *
+tarpan_new (void)
+{
+  return (struct tarpan *) XCALLOC (MTYPE_TARPAN,
+				       sizeof (struct tarpan));
+}
+
 /* Make hash value of tarpan attribute. This function is used by
    hash package.*/
 unsigned int
@@ -66,13 +73,6 @@ tarpan_parse (u_int32_t *pnt, u_short length)
   tmp->deserialized = msg;
 
   return tarpan_intern(tmp);
-}
-
-static struct tarpan *
-tarpan_new (void)
-{
-  return (struct tarpan *) XCALLOC (MTYPE_TARPAN,
-				       sizeof (struct tarpan));
 }
 
 void
