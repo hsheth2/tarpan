@@ -13,6 +13,8 @@
 #include "bgpd/bgp_tarpan.h"
 #include "bgpd/attr_tarpan.pb-c.h"
 
+#include "log.h"
+
 static struct hash *tarpan_hash;
 
 /* Make hash value of tarpan attribute. This function is used by
@@ -37,7 +39,7 @@ tarpan_hash_make (struct tarpan * tarpan)
 }
 
 int
-tarpan_cmp (const void *p1, const void *p2)
+tarpan_cmp (const struct tarpan *p1, const struct tarpan *p2)
 {
   const struct tarpan * tarpan1 = p1;
   const struct tarpan * tarpan2 = p2;
@@ -57,7 +59,8 @@ tarpan_parse (u_int32_t *pnt, u_short length)
 
   TarpanMsg *msg = tarpan_msg__unpack(NULL, length, pnt);
   if (msg == NULL) {
-      abort("tarpan: AAAAAAAAAAAAAHHHHH");
+      zlog_err("tarpan: AAAAAAAAH!");
+      abort();
   }
 
   tmp.deserialized = msg;
@@ -125,6 +128,12 @@ tarpan_unintern (struct tarpan **tarp)
       tarpan_free (*tarp);
       *tarp = NULL;
     }
+}
+
+char *
+tarpan_str (struct tarpan *tarp)
+{
+  return NULL;
 }
 
 void
