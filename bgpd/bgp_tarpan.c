@@ -130,6 +130,12 @@ tarpan_unintern (struct tarpan **tarp)
     }
 }
 
+char *
+tarpan_str (struct tarpan *tarp)
+{
+  return NULL;
+}
+
 void
 tarpan_init (void)
 {
