@@ -2493,8 +2493,10 @@ bgp_packet_attribute (struct bgp *bgp, struct peer *peer,
     }
 
   // No matter what, there will be a tarpan to send.
-  // TODO check for null val
-  stream_putc (s, BGP_ATTR_FLAG_OPTIONAL|BGP_ATTR_FLAG_TRANS|BGP_ATTR_FLAG_EXTLEN);
+  assert(attr->tarpan);
+  if (!attr->tarpan->val)
+    tarpan_reserialize(attr->tarpan);
+  stream_putc (s, BGP_ATTR_FLAG_OPTIONAL|BGP_ATTR_FLAG_TRANS|BGP_ATTR_FLAG_EXTLEN); // we always use extended length
   stream_putc (s, BGP_ATTR_COMMUNITIES);
   stream_putw (s, attr->tarpan->length);
   stream_put(s, attr->tarpan->val, attr->tarpan->length);
