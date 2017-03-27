@@ -648,7 +648,7 @@ struct bgp_nlri
 #define BGP_ATTR_AS4_PATH                       17
 #define BGP_ATTR_AS4_AGGREGATOR                 18
 #define BGP_ATTR_AS_PATHLIMIT                   21
-#define BGP_ATTR_TARPAN                         30 // using bit 30 so that it fits on a 32 bit flag
+#define BGP_ATTR_TARPAN                         19 // using bit 19 so that it fits on a 32 bit flag
 
 /* BGP update origin.  */
 #define BGP_ORIGIN_IGP                           0
