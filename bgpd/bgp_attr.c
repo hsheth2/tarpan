@@ -62,6 +62,7 @@ static const struct message attr_str [] =
 	{ BGP_ATTR_AS4_PATH,         "AS4_PATH" },
 	{ BGP_ATTR_AS4_AGGREGATOR,   "AS4_AGGREGATOR" },
 	{ BGP_ATTR_AS_PATHLIMIT,     "AS_PATHLIMIT" },
+	{ BGP_ATTR_TARPAN,	     "TARPAN" }
     };
 static const int attr_str_max = array_size(attr_str);
 
