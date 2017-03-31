@@ -1713,6 +1713,8 @@ bgp_tarpan_parse (struct bgp_attr_parser_args *args)
   attr->tarpan =
       tarpan_parse ((u_int32_t *)stream_pnt (peer->ibuf), length);
 
+  stream_forward_getp (peer->ibuf, length);
+
   if (!attr->tarpan)
     return bgp_attr_malformed (args,
 			       BGP_NOTIFY_UPDATE_OPT_ATTR_ERR,
