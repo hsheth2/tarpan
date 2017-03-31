@@ -58,7 +58,7 @@ tarpan_cmp (const struct tarpan *p1, const struct tarpan *p2)
 struct tarpan *
 tarpan_parse (u_int32_t *pnt, u_short length)
 {
-  // TODO: work our protobuf magic
+  // work our protobuf magic
   struct tarpan* tmp = tarpan_new();
 
   tmp->length = length;
