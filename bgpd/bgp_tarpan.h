@@ -16,13 +16,7 @@ struct tarpan
   /* Reference count of tarpan value. */
   unsigned long refcnt;
 
-  /* tarpan value size.  */
-  u_int16_t length;
-
-  /* tarpan value */ // TODO(tarpan) only for now
-  u_int32_t *val;
-
-  TarpanMsg *deserialized;
+  TarpanMsg *message;
 };
 
 /* (tarpan) Prototypes of tarpan attribute functions.  */

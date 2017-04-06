@@ -29,7 +29,7 @@ tarpan_new (void)
 unsigned int
 tarpan_hash_make (struct tarpan * tarpan)
 {
-  return jhash(tarpan->val, tarpan->length, 0);
+  return (unsigned int) tarpan->message;
 }
 
 int
@@ -38,8 +38,7 @@ tarpan_cmp (const struct tarpan *p1, const struct tarpan *p2)
   const struct tarpan * tarpan1 = p1;
   const struct tarpan * tarpan2 = p2;
 
-  return (tarpan1->length == tarpan2->length &&
-	  memcmp (tarpan1->val, tarpan2->val, tarpan1->length) == 0);
+  return p1->message == p2->message;
 }
 
 struct tarpan *
@@ -48,16 +47,13 @@ tarpan_parse (u_int32_t *pnt, u_short length)
   // work our protobuf magic
   struct tarpan* tmp = tarpan_new();
 
-  tmp->length = length;
-  tmp->val = pnt;
-
   TarpanMsg *msg = tarpan_msg__unpack(NULL, length, pnt);
   if (msg == NULL) {
       zlog_err("tarpan: AAAAAAAAH!");
       abort();
   }
 
-  tmp->deserialized = msg;
+  tmp->message = msg;
 
   zlog_info("Received tarpan packet, version %d", msg->version);
 
@@ -67,15 +63,11 @@ tarpan_parse (u_int32_t *pnt, u_short length)
 void
 tarpan_free (struct tarpan *tarp)
 {
-  if (tarp->val)
-    XFREE (MTYPE_TARPAN, tarp->val);
-
-  if (tarp->deserialized)
-    tarpan_msg__free_unpacked(tarp->deserialized, NULL);
+  if (tarp->message)
+    tarpan_msg__free_unpacked(tarp->message, NULL);
 
   XFREE (MTYPE_TARPAN, tarp);
 }
-
 
 struct tarpan *
 tarpan_intern (struct tarpan *tarp)
@@ -117,29 +109,6 @@ tarpan_unintern (struct tarpan **tarp)
       tarpan_free (*tarp);
       *tarp = NULL;
     }
-}
-
-void
-tarpan_mark_modified (struct tarpan *tarp)
-{
-  if (tarp->val)
-    {
-      XFREE (MTYPE_TARPAN, tarp->val);
-      tarp->val = NULL;
-      tarp->length = 0;
-    }
-}
-
-void
-tarpan_reserialize (struct tarpan *tarp)
-{
-  if (tarp->val)
-    tarpan_mark_modified(tarp);
-
-  // reserialize
-  tarp->length = tarpan_msg__get_packed_size(tarp->deserialized);
-  tarp->val = XMALLOC(MTYPE_BGP, tarp->length);
-  tarpan_msg__pack(tarp->deserialized, tarp->val);
 }
 
 char *

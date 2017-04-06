@@ -2480,16 +2480,14 @@ bgp_packet_attribute (struct bgp *bgp, struct peer *peer,
       // create a new tarpan attribute
       zlog_info("Creating a new tarpan!");
       TarpanMsg msg = TARPAN_MSG__INIT;
-      void *buf;
-      unsigned int len;
 
       // TODO use reserialize method
       msg.version = 0;
-      len = tarpan_msg__get_packed_size(&msg);
-      buf = malloc(len);
-      tarpan_msg__pack(&msg, buf);
 
-      struct tarpan * tarp = tarpan_parse(buf, len);
+      struct tarpan * tarp = tarpan_new();
+      tarp->message = msg;
+
+      tarpan_intern(tarp);
 
       attr->tarpan = tarp;
       attr->flag |= ATTR_FLAG_BIT (BGP_ATTR_TARPAN);
@@ -2497,13 +2495,18 @@ bgp_packet_attribute (struct bgp *bgp, struct peer *peer,
 
   // No matter what, there will be a tarpan to send.
   assert(attr->tarpan);
-  if (!attr->tarpan->val)
-    tarpan_reserialize(attr->tarpan);
   stream_putc (s, BGP_ATTR_FLAG_OPTIONAL|BGP_ATTR_FLAG_TRANS|BGP_ATTR_FLAG_EXTLEN); // we always use extended length
   stream_putc (s, BGP_ATTR_TARPAN);
-  stream_putw (s, attr->tarpan->length);
-  stream_put(s, attr->tarpan->val, attr->tarpan->length);
+
+  unsigned int len = tarpan_msg__get_packed_size(attr->tarpan->message);
+  void *buf = malloc(len);
+  tarpan_msg__pack(attr->tarpan->message, buf);
+
+  stream_putw (s, len);
+  stream_put(s, buf, len);
   zlog_info("Sent tarpan!");
+
+  free(buf);
 
   /* Route Reflector. */
   if (peer->sort == BGP_PEER_IBGP
