@@ -17,7 +17,7 @@
 
 static struct hash *tarpan_hash;
 
-static struct tarpan *
+struct tarpan *
 tarpan_new (void)
 {
   struct tarpan * tarp = (struct tarpan *) XCALLOC (MTYPE_TARPAN,
