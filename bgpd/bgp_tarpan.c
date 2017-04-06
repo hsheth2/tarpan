@@ -20,8 +20,14 @@ static struct hash *tarpan_hash;
 static struct tarpan *
 tarpan_new (void)
 {
-  return (struct tarpan *) XCALLOC (MTYPE_TARPAN,
-				       sizeof (struct tarpan));
+  struct tarpan * tarp = (struct tarpan *) XCALLOC (MTYPE_TARPAN,
+						       sizeof (struct tarpan));
+
+  tarp->message = malloc(sizeof(TarpanMsg));
+  tarpan_msg__init(tarp->message);
+  tarp->message->version = 1337;
+
+  return tarp;
 }
 
 /* Make hash value of tarpan attribute. This function is used by

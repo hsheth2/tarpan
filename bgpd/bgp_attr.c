@@ -2479,14 +2479,8 @@ bgp_packet_attribute (struct bgp *bgp, struct peer *peer,
     {
       // create a new tarpan attribute
       zlog_info("Creating a new tarpan!");
-      TarpanMsg msg = TARPAN_MSG__INIT;
-
-      // TODO use reserialize method
-      msg.version = 0;
 
       struct tarpan * tarp = tarpan_new();
-      tarp->message = msg;
-
       tarpan_intern(tarp);
 
       attr->tarpan = tarp;
