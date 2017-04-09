@@ -8,7 +8,7 @@
 #include "bgpd/bgp_tarpan.h"
 #include "bgpd/wiser.h"
 
-struct tarpan_protocol_handler wiser = {
+struct tarpan_protocol_handler wiser_protocol_handler = {
     .bgp_best_selection = NULL
 };
 

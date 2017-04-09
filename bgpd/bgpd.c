@@ -5418,6 +5418,9 @@ bgp_master_init (void)
 void
 bgp_init (void)
 {
+  // TODO: Put this in a better place
+  tarpan_active_handler = &wiser_protocol_handler;
+
   /* BGP VTY commands installation.  */
   bgp_vty_init ();
 
