@@ -24,6 +24,11 @@ struct tarpan_protocol_handler
 {
   /* functions that must be implemented */
 
+  // route selection function
+  void (*bgp_best_selection) (struct bgp *bgp, struct bgp_node *rn,
+  		    struct bgp_maxpaths_cfg *mpath_cfg,
+  		    struct bgp_info_pair *result);
+
   /* optional functions */
   // NONE
 };

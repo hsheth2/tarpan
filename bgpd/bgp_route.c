@@ -1320,6 +1320,8 @@ bgp_best_selection (struct bgp *bgp, struct bgp_node *rn,
   int paths_eq, do_mpath;
   struct list mp_list;
 
+  // TODO (tarpan) add route selection
+
   bgp_mp_list_init (&mp_list);
   do_mpath = (mpath_cfg->maxpaths_ebgp != BGP_DEFAULT_MAXPATHS ||
 	      mpath_cfg->maxpaths_ibgp != BGP_DEFAULT_MAXPATHS);
