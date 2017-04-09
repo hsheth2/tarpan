@@ -11,5 +11,6 @@
 #include "bgpd/bgp_tarpan.h"
 
 extern struct tarpan_protocol_handler wiser;
+tarpan_active_handler = &wiser;
 
 #endif /* BGPD_WISER_H_ */
