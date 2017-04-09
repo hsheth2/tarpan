@@ -33,9 +33,6 @@ struct tarpan_protocol_handler
   // NONE
 };
 
-/* the currently active protocol handler */
-struct tarpan_protocol_handler * tarpan_active_handler = NULL;
-
 /* (tarpan) Prototypes of tarpan attribute functions.  */
 extern struct tarpan * tarpan_new (void);
 extern void tarpan_init (void);

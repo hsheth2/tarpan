@@ -17,6 +17,9 @@
 
 static struct hash *tarpan_hash;
 
+/* the currently active protocol handler */
+struct tarpan_protocol_handler * tarpan_active_handler = NULL;
+
 struct tarpan *
 tarpan_new (void)
 {
