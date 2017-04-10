@@ -5418,9 +5418,6 @@ bgp_master_init (void)
 void
 bgp_init (void)
 {
-  // TODO: Put this in a better place
-  tarpan_active_handler = &wiser_protocol_handler;
-
   /* BGP VTY commands installation.  */
   bgp_vty_init ();
 
@@ -5454,6 +5451,9 @@ bgp_init (void)
 
   /* Community list initialize. */
   bgp_clist = community_list_init ();
+
+  /* init tarpan */
+  tarpan_protocol_init ();
 
 #ifdef HAVE_SNMP
   bgp_snmp_init ();
