@@ -37,14 +37,9 @@ struct tarpan_protocol_handler
 /* the currently active protocol handler */
 extern struct tarpan_protocol_handler * tarpan_active_handler;
 
-void tarpan_set_protocol_handler(struct tarpan_protocol_handler * handler) {
-  tarpan_active_handler = handler;
-}
+extern void tarpan_set_protocol_handler(struct tarpan_protocol_handler * handler);
 
-void tarpan_protocol_init(void)
-{
-  // nothing, for now
-}
+extern void tarpan_protocol_init(void);
 
 /* (tarpan) Prototypes of tarpan attribute functions.  */
 extern struct tarpan * tarpan_new (void);

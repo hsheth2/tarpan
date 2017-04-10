@@ -20,6 +20,15 @@ static struct hash *tarpan_hash;
 /* the currently active protocol handler */
 struct tarpan_protocol_handler * tarpan_active_handler = NULL;
 
+void tarpan_set_protocol_handler(struct tarpan_protocol_handler * handler) {
+  tarpan_active_handler = handler;
+}
+
+void tarpan_protocol_init(void)
+{
+  // nothing, for now
+}
+
 struct tarpan *
 tarpan_new (void)
 {
