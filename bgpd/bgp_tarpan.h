@@ -8,6 +8,7 @@
 #ifndef _QUAGGA_BGP_TARPAN_H
 #define _QUAGGA_BGP_TARPAN_H
 
+#include <sys/types.h>
 #include "bgpd/attr_tarpan.pb-c.h"
 
 /* Tarpan attribute */
