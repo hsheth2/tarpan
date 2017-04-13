@@ -60,7 +60,10 @@ tarpan_hash_make (struct tarpan * tarpan)
 int
 tarpan_cmp (const struct tarpan *p1, const struct tarpan *p2)
 {
-  return p1->message == p2->message; // compare pointers
+  if (p1->message == p2->message) // compare pointers
+    return 1;
+  else
+    return 0;
 }
 
 struct tarpan *

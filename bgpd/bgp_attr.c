@@ -2040,7 +2040,7 @@ bgp_attr_parse (struct peer *peer, struct attr *attr, bgp_size_t size,
 	  ret = bgp_attr_ext_communities (&attr_args);
 	  break;
 	case BGP_ATTR_TARPAN:
-	  // (tarpan) call a method
+	  // (tarpan) deal with incoming packet
 	  ret = bgp_tarpan_parse(&attr_args);
 	  break;
 	default:
