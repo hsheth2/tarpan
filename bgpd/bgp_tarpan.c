@@ -9,12 +9,15 @@
 
 #include "hash.h"
 #include "memory.h"
+#include "log.h"
 
 #include "bgpd/common.h"
 #include "bgpd/bgp_tarpan.h"
 #include "bgpd/attr_tarpan.pb-c.h"
 
-#include "log.h"
+// include possible protocols
+#include "wiser.h"
+// active protocol actually set in `tarpan_protocol_init`
 
 static struct hash *tarpan_hash;
 
@@ -27,7 +30,7 @@ void tarpan_set_protocol_handler(struct tarpan_protocol_handler * handler) {
 
 void tarpan_protocol_init(void)
 {
-  // nothing, for now
+  tarpan_set_protocol_handler(&wiser_protocol_handler);
 }
 
 struct tarpan *
