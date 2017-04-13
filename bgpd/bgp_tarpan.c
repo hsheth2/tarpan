@@ -41,6 +41,14 @@ tarpan_new (void)
 {
   struct tarpan * tarp = (struct tarpan *) XCALLOC (MTYPE_TARPAN,
 						       sizeof (struct tarpan));
+  return tarp;
+}
+
+struct tarpan *
+tarpan_new_default (void)
+{
+  struct tarpan * tarp = (struct tarpan *) XCALLOC (MTYPE_TARPAN,
+						       sizeof (struct tarpan));
 
   tarp->message = malloc(sizeof(TarpanMsg));
   tarpan_msg__init(tarp->message);

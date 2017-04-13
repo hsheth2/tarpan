@@ -2480,8 +2480,8 @@ bgp_packet_attribute (struct bgp *bgp, struct peer *peer,
       // create a new tarpan attribute
       zlog_info("Creating a new tarpan!");
 
-      struct tarpan * tarp = tarpan_new();
-      tarpan_intern(tarp);
+      struct tarpan * tarp = tarpan_new_default();
+      tarp = tarpan_intern(tarp);
 
       attr->tarpan = tarp;
       attr->flag |= ATTR_FLAG_BIT (BGP_ATTR_TARPAN);

@@ -45,6 +45,7 @@ extern void tarpan_protocol_init(void);
 
 /* (tarpan) Prototypes of tarpan attribute functions.  */
 extern struct tarpan * tarpan_new (void);
+extern struct tarpan * tarpan_new_default (void);
 extern void tarpan_init (void);
 extern void tarpan_finish (void);
 extern void tarpan_free (struct tarpan *);
