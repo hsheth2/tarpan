@@ -48,7 +48,7 @@ tarpan_new (void)
 unsigned int
 tarpan_hash_make (struct tarpan * tarpan)
 {
-  return (unsigned int) tarpan->message;
+  return (uintptr_t) tarpan->message;
 }
 
 int
