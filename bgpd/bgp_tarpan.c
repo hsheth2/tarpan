@@ -136,7 +136,7 @@ tarpan_unintern (struct tarpan **tarp)
   if ((*tarp)->refcnt == 0)
     {
       /* Tarpan value tarp must exist in hash. */
-      ret = (struct tarp *) hash_release (tarpan_hash, *tarp);
+      ret = (struct tarp *) hash_release (tarpan_hash, (void*) *tarp);
       assert (ret != NULL);
 
       tarpan_free (*tarp);
@@ -153,7 +153,8 @@ tarpan_str (struct tarpan *tarp)
 void
 tarpan_init (void)
 {
-  tarpan_hash = hash_create (tarpan_hash_make /* TODO: vs. tarpan_hash_key_make??? */, tarpan_cmp);
+  tarpan_hash = hash_create ((unsigned int (*) (void*)) tarpan_hash_make,
+			     (int (*) (const void*, const void*)) tarpan_cmp);
 }
 
 void

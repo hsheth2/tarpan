@@ -19,7 +19,7 @@ struct tarpan
   /* Reference count of tarpan value. */
   unsigned long refcnt;
 
-  TarpanMsg *message;
+  TarpanMsg * message;
 };
 
 /* tarpan protocol API */

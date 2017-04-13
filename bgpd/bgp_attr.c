@@ -2484,7 +2484,7 @@ bgp_packet_attribute (struct bgp *bgp, struct peer *peer,
       tarp = tarpan_intern(tarp);
 
       attr->tarpan = tarp;
-      attr->flag |= ATTR_FLAG_BIT (BGP_ATTR_TARPAN);
+      SET_FLAG(attr->flag, ATTR_FLAG_BIT (BGP_ATTR_TARPAN));
     }
 
   // No matter what, there will be a tarpan to send.
