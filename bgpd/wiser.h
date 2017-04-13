@@ -8,6 +8,7 @@
 #ifndef BGPD_WISER_H_
 #define BGPD_WISER_H_
 
+#include "bgpd/common.h"
 #include "bgpd/bgp_tarpan.h"
 
 extern struct tarpan_protocol_handler wiser_protocol_handler;

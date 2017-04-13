@@ -5,6 +5,7 @@
  *      Author: hsheth
  */
 
+#include "bgpd/common.h"
 #include "bgpd/bgp_tarpan.h"
 #include "bgpd/wiser.h"
 

@@ -10,6 +10,7 @@
 #include "hash.h"
 #include "memory.h"
 
+#include "bgpd/common.h"
 #include "bgpd/bgp_tarpan.h"
 #include "bgpd/attr_tarpan.pb-c.h"
 

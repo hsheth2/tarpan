@@ -36,6 +36,7 @@ Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 #include "workqueue.h"
 
 #include "bgpd/bgpd.h"
+#include "bgpd/common.h"
 #include "bgpd/bgp_table.h"
 #include "bgpd/bgp_route.h"
 #include "bgpd/bgp_attr.h"
@@ -1299,12 +1300,6 @@ bgp_announce_check_rsclient (struct bgp_info *ri, struct peer *rsclient,
 
   return 1;
 }
-
-struct bgp_info_pair
-{
-  struct bgp_info *old;
-  struct bgp_info *new;
-};
 
 static void
 bgp_best_selection (struct bgp *bgp, struct bgp_node *rn,
