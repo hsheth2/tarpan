@@ -17,7 +17,8 @@
 
 // include possible protocols
 #include "wiser.h"
-// active protocol actually set in `tarpan_protocol_init`
+// protocol initialization functions are called and
+// active protocol is  set in `tarpan_protocol_init`
 
 static struct hash *tarpan_hash;
 
@@ -30,6 +31,8 @@ void tarpan_set_protocol_handler(struct tarpan_protocol_handler * handler) {
 
 void tarpan_protocol_init(void)
 {
+  wiser_protocol_init();
+
   tarpan_set_protocol_handler(&wiser_protocol_handler);
 }
 

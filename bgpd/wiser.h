@@ -12,6 +12,11 @@
 #include "bgpd/bgp_tarpan.h"
 
 extern struct tarpan_protocol_handler wiser_protocol_handler;
-//tarpan_active_handler = &wiser;
+
+void wiser_protocol_init(void);
+
+void wiser_best_selection (struct bgp *bgp, struct bgp_node *rn,
+  		    struct bgp_maxpaths_cfg *mpath_cfg,
+  		    struct bgp_info_pair *result);
 
 #endif /* BGPD_WISER_H_ */
