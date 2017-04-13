@@ -1,7 +1,6 @@
 // works with only proto2
 syntax = "proto2";
 
-
 message Wiser {
 	required int32 a = 1;
 	required int32 b = 2;
