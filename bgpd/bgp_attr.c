@@ -1711,7 +1711,7 @@ bgp_tarpan_parse (struct bgp_attr_parser_args *args)
     }
 
   attr->tarpan =
-      tarpan_parse ((u_int32_t *)stream_pnt (peer->ibuf), length);
+      tarpan_parse ((u_int8_t *)stream_pnt (peer->ibuf), length);
 
   stream_forward_getp (peer->ibuf, length);
 

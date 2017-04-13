@@ -54,14 +54,11 @@ tarpan_hash_make (struct tarpan * tarpan)
 int
 tarpan_cmp (const struct tarpan *p1, const struct tarpan *p2)
 {
-  const struct tarpan * tarpan1 = p1;
-  const struct tarpan * tarpan2 = p2;
-
-  return p1->message == p2->message;
+  return p1->message == p2->message; // compare pointers
 }
 
 struct tarpan *
-tarpan_parse (u_int32_t *pnt, u_short length)
+tarpan_parse (u_int8_t *pnt, u_short length)
 {
   // work our protobuf magic
   struct tarpan* tmp = tarpan_new();
