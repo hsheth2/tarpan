@@ -96,7 +96,7 @@ tarpan_parse (u_int8_t *pnt, u_short length)
 
   zlog_info("Received tarpan packet, version %d", msg->version);
 
-  struct tarpan * ret = tmp; //tarpan_intern(tmp);
+  struct tarpan * ret = tarpan_intern(tmp);
 
   zlog_debug("tarpan_parse ret = %p %lu", ret, ret->refcnt);
 
