@@ -89,8 +89,8 @@ tarpan_parse (u_int8_t *pnt, u_short length)
   TarpanMsg *msg = tarpan_msg__unpack(NULL, length, pnt);
   if (msg == NULL) {
       zlog_err("tarpan: AAAAAAAAH!");
-      abort();
   }
+  assert(msg != NULL);
 
   tmp->message = msg;
 
