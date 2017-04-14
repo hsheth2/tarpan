@@ -41,6 +41,9 @@ tarpan_new (void)
 {
   struct tarpan * tarp = (struct tarpan *) XCALLOC (MTYPE_TARPAN,
 						       sizeof (struct tarpan));
+
+  zlog_debug("tarpan_new %p %o", tarp, tarp->refcnt);
+
   return tarp;
 }
 
@@ -54,6 +57,8 @@ tarpan_new_default (void)
   tarpan_msg__init(tarp->message);
   tarp->message->version = 1337;
 
+  zlog_debug("tarpan_new_default %p %o", tarp, tarp->refcnt);
+
   return tarp;
 }
 
@@ -62,6 +67,7 @@ tarpan_new_default (void)
 unsigned int
 tarpan_hash_make (struct tarpan * tarpan)
 {
+  zlog_debug("tarpan_hash_make %p %o", tarpan, tarpan->refcnt);
   return (uintptr_t) tarpan->message;
 }
 
@@ -90,12 +96,18 @@ tarpan_parse (u_int8_t *pnt, u_short length)
 
   zlog_info("Received tarpan packet, version %d", msg->version);
 
-  return tarpan_intern(tmp);
+  struct tarpan * ret = tarpan_intern(tmp);
+
+  zlog_debug("tarpan_parse ret = %p %o", ret, ret->refcnt);
+
+  return ret;
 }
 
 void
 tarpan_free (struct tarpan *tarp)
 {
+  zlog_debug("tarpan_free %p %o", tarp, tarp->refcnt);
+
   if (tarp->message)
     tarpan_msg__free_unpacked(tarp->message, NULL);
 
@@ -110,6 +122,8 @@ tarpan_intern (struct tarpan *tarp)
   /* Assert this tarpan structure is not interned. */
   assert (tarp->refcnt == 0);
 
+  zlog_debug("tarpan_intern tarp = %p %o", tarp, tarp->refcnt);
+
   /* Lookup tarpan hash. */
   find = (struct tarpan *) hash_get (tarpan_hash, tarp, hash_alloc_intern);
 
@@ -121,6 +135,8 @@ tarpan_intern (struct tarpan *tarp)
   /* Increment reference counter.  */
   find->refcnt++;
 
+  zlog_debug("tarpan_intern find = %p %o", find, find->refcnt);
+
   return find;
 }
 
@@ -129,8 +145,12 @@ tarpan_unintern (struct tarpan **tarp)
 {
   struct tarpan *ret;
 
+  zlog_debug("tarpan_unintern (*tarp) = %p %o", tarp, tarp->refcnt);
+
   if ((*tarp)->refcnt)
     (*tarp)->refcnt--;
+
+  zlog_debug("tarpan_unintern (*tarp) = %p %o", tarp, tarp->refcnt);
 
   /* Pull off from hash.  */
   if ((*tarp)->refcnt == 0)
@@ -147,6 +167,8 @@ tarpan_unintern (struct tarpan **tarp)
 char *
 tarpan_str (struct tarpan *tarp)
 {
+  zlog_debug("tarpan_str %p %o", tarp, tarp->refcnt);
+
   return NULL;
 }
 
