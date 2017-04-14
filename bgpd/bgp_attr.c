@@ -2474,6 +2474,7 @@ bgp_packet_attribute (struct bgp *bgp, struct peer *peer,
       stream_put (s, attr->community->val, attr->community->size * 4);
     }
 
+  struct tarpan * tarpan_wire;
   // (tarpan) here is where tarpan serialization is going
   if (!(attr->flag & ATTR_FLAG_BIT (BGP_ATTR_TARPAN)))
     {
@@ -2483,18 +2484,21 @@ bgp_packet_attribute (struct bgp *bgp, struct peer *peer,
       struct tarpan * tarp = tarpan_new_default();
 //      tarp = tarpan_intern(tarp);
 
-      attr->tarpan = tarp;
-      SET_FLAG(attr->flag, ATTR_FLAG_BIT (BGP_ATTR_TARPAN));
+//      attr->tarpan = tarp;
+      tarpan_wire = tarp;
+//      SET_FLAG(attr->flag, ATTR_FLAG_BIT (BGP_ATTR_TARPAN));
     }
+  else
+    tarpan_wire = attr->tarpan;
 
   // No matter what, there will be a tarpan to send.
-  assert(attr->tarpan);
+  assert(tarpan_wire);
   stream_putc (s, BGP_ATTR_FLAG_OPTIONAL|BGP_ATTR_FLAG_TRANS|BGP_ATTR_FLAG_EXTLEN); // we always use extended length
   stream_putc (s, BGP_ATTR_TARPAN);
 
-  unsigned int len = tarpan_msg__get_packed_size(attr->tarpan->message);
+  unsigned int len = tarpan_msg__get_packed_size(tarpan_wire->message);
   void *buf = malloc(len);
-  tarpan_msg__pack(attr->tarpan->message, buf);
+  tarpan_msg__pack(tarpan_wire->message, buf);
 
   stream_putw (s, len);
   stream_put(s, buf, len);
