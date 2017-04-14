@@ -2481,7 +2481,7 @@ bgp_packet_attribute (struct bgp *bgp, struct peer *peer,
       zlog_info("Creating a new tarpan!");
 
       struct tarpan * tarp = tarpan_new_default();
-      tarp = tarpan_intern(tarp);
+//      tarp = tarpan_intern(tarp);
 
       attr->tarpan = tarp;
       SET_FLAG(attr->flag, ATTR_FLAG_BIT (BGP_ATTR_TARPAN));
