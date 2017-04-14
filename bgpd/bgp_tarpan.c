@@ -20,8 +20,6 @@
 // protocol initialization functions are called and
 // active protocol is  set in `tarpan_protocol_init`
 
-static struct hash *tarpan_hash;
-
 /* the currently active protocol handler */
 struct tarpan_protocol_handler * tarpan_active_handler = NULL;
 
@@ -42,7 +40,7 @@ tarpan_new (void)
   struct tarpan * tarp = (struct tarpan *) XCALLOC (MTYPE_TARPAN,
 						       sizeof (struct tarpan));
 
-  zlog_debug("tarpan_new %p %lu", tarp, tarp->refcnt);
+//  zlog_debug("tarpan_new %p %lu", tarp, tarp->refcnt);
 
   return tarp;
 }
@@ -57,7 +55,7 @@ tarpan_new_default (void)
   tarpan_msg__init(tarp->message);
   tarp->message->version = 1337;
 
-  zlog_debug("tarpan_new_default %p %lu", tarp, tarp->refcnt);
+//  zlog_debug("tarpan_new_default %p %lu", tarp, tarp->refcnt);
 
   return tarp;
 }
@@ -67,7 +65,7 @@ tarpan_new_default (void)
 unsigned int
 tarpan_hash_make (struct tarpan * tarpan)
 {
-  zlog_debug("tarpan_hash_make %p %lu", tarpan, tarpan->refcnt);
+//  zlog_debug("tarpan_hash_make %p %lu", tarpan, tarpan->refcnt);
   return (uintptr_t) tarpan->message;
 }
 
@@ -98,7 +96,7 @@ tarpan_parse (u_int8_t *pnt, u_short length)
 
   struct tarpan * ret = tarpan_intern(tmp);
 
-  zlog_debug("tarpan_parse ret = %p %lu", ret, ret->refcnt);
+//  zlog_debug("tarpan_parse ret = %p %lu", ret, ret->refcnt);
 
   return ret;
 }
@@ -106,7 +104,7 @@ tarpan_parse (u_int8_t *pnt, u_short length)
 void
 tarpan_free (struct tarpan *tarp)
 {
-  zlog_debug("tarpan_free %p %lu", tarp, tarp->refcnt);
+//  zlog_debug("tarpan_free %p %lu", tarp, tarp->refcnt);
 
   if (tarp->message)
     tarpan_msg__free_unpacked(tarp->message, NULL);
@@ -114,60 +112,10 @@ tarpan_free (struct tarpan *tarp)
   XFREE (MTYPE_TARPAN, tarp);
 }
 
-struct tarpan *
-tarpan_intern (struct tarpan *tarp)
-{
-  struct tarpan *find;
-
-  /* Assert this tarpan structure is not interned. */
-  assert (tarp->refcnt == 0);
-
-  zlog_debug("tarpan_intern tarp = %p %lu", tarp, tarp->refcnt);
-
-  /* Lookup tarpan hash. */
-  find = (struct tarpan *) hash_get (tarpan_hash, tarp, hash_alloc_intern);
-
-  /* Argument tarp is allocated temporary.  So when it is not used in
-     hash, it should be freed.  */
-  if (find != tarp)
-    tarpan_free(tarp);
-
-  /* Increment reference counter.  */
-  find->refcnt++;
-
-  zlog_debug("tarpan_intern find = %p %lu", find, find->refcnt);
-
-  return find;
-}
-
-void
-tarpan_unintern (struct tarpan **tarp)
-{
-  struct tarpan *ret;
-
-  zlog_debug("tarpan_unintern (*tarp) = %p %lu", (*tarp), (*tarp)->refcnt);
-
-  if ((*tarp)->refcnt)
-    (*tarp)->refcnt--;
-
-  zlog_debug("tarpan_unintern (*tarp) = %p %lu", (*tarp), (*tarp)->refcnt);
-
-  /* Pull off from hash.  */
-  if ((*tarp)->refcnt == 0)
-    {
-      /* Tarpan value tarp must exist in hash. */
-      ret = (struct tarp *) hash_release (tarpan_hash, (void*) *tarp);
-      assert (ret != NULL);
-
-      tarpan_free (*tarp);
-      *tarp = NULL;
-    }
-}
-
 char *
 tarpan_str (struct tarpan *tarp)
 {
-  zlog_debug("tarpan_str %p %lu", tarp, tarp->refcnt);
+//  zlog_debug("tarpan_str %p %lu", tarp, tarp->refcnt);
 
   return NULL;
 }
@@ -175,14 +123,12 @@ tarpan_str (struct tarpan *tarp)
 void
 tarpan_init (void)
 {
-  tarpan_hash = hash_create ((unsigned int (*) (void*)) tarpan_hash_make,
-			     (int (*) (const void*, const void*)) tarpan_cmp);
+
 }
 
 void
 tarpan_finish (void)
 {
-  hash_free (tarpan_hash);
-  tarpan_hash = NULL;
+
 }
 

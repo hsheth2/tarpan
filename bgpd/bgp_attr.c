@@ -523,13 +523,6 @@ bgp_attr_intern (struct attr *attr)
       else
 	attr->community->refcnt++;
     }
-  if (attr->tarpan) // MARK (tarpan) here we intern the tarpan attribute
-    {
-      if (! attr->tarpan->refcnt)
-	attr->tarpan = tarpan_intern (attr->tarpan);
-      else
-	attr->tarpan->refcnt++;
-    }
   if (attr->extra)
     {
       struct attr_extra *attre = attr->extra;
@@ -671,8 +664,6 @@ bgp_attr_unintern_sub (struct attr *attr)
     community_unintern (&attr->community);
   UNSET_FLAG(attr->flag, ATTR_FLAG_BIT (BGP_ATTR_COMMUNITIES));
 
-  if (attr->tarpan)
-    tarpan_unintern (&attr->tarpan);
   UNSET_FLAG(attr->flag, ATTR_FLAG_BIT (BGP_ATTR_TARPAN));
 
   if (attr->extra)
@@ -730,7 +721,7 @@ bgp_attr_flush (struct attr *attr)
     aspath_free (attr->aspath);
   if (attr->community && ! attr->community->refcnt)
     community_free (attr->community);
-  if (attr->tarpan && ! attr->tarpan->refcnt)
+  if (attr->tarpan)
     tarpan_free (attr->tarpan);
   if (attr->extra)
     {
@@ -2481,7 +2472,6 @@ bgp_packet_attribute (struct bgp *bgp, struct peer *peer,
       zlog_info("Creating a new tarpan!");
 
       struct tarpan * tarp = tarpan_new_default();
-      tarp = tarpan_intern(tarp);
 
       attr->tarpan = tarp;
       SET_FLAG(attr->flag, ATTR_FLAG_BIT (BGP_ATTR_TARPAN));
