@@ -19,4 +19,6 @@ void wiser_best_selection (struct bgp *bgp, struct bgp_node *rn,
   		    struct bgp_maxpaths_cfg *mpath_cfg,
   		    struct bgp_info_pair *result);
 
+// TODO other functions
+
 #endif /* BGPD_WISER_H_ */
