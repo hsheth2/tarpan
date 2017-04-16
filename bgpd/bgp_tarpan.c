@@ -55,7 +55,7 @@ tarpan_new_default (void)
 
   tarp->message = malloc(sizeof(TarpanMsg));
   tarpan_msg__init(tarp->message);
-  tarp->message->version = 1337;
+  tarp->message->version = 12;
 
   zlog_debug("tarpan_new_default %p %lu", tarp, tarp->refcnt);
 

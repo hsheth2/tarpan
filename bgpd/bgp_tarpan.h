@@ -28,9 +28,18 @@ struct tarpan_protocol_handler
   /* functions that must be implemented */
 
   // route selection function
+  // TODO call this functions
   void (*bgp_best_selection) (struct bgp *bgp, struct bgp_node *rn,
   		    struct bgp_maxpaths_cfg *mpath_cfg,
   		    struct bgp_info_pair *result);
+
+  // called within tarpan_parse
+  void (*packet_received_handler) (struct peer *const peer,
+                    struct attr *const attr);
+
+  // called after calling tarpan_new_default
+  void (*initialize_packet) (struct peer *const peer,
+                      struct attr *const attr);
 
   /* optional functions */
   // NONE

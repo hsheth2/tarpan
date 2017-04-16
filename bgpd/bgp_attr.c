@@ -1722,6 +1722,11 @@ bgp_tarpan_parse (struct bgp_attr_parser_args *args)
 
   attr->flag |= ATTR_FLAG_BIT (BGP_ATTR_TARPAN);
 
+  if (tarpan_active_handler) {
+    zlog_info("Calling tarpan api packet_received_handler");
+    tarpan_active_handler->packet_received_handler(peer, attr);
+  }
+
   return BGP_ATTR_PARSE_PROCEED;
 }
 
@@ -2482,9 +2487,11 @@ bgp_packet_attribute (struct bgp *bgp, struct peer *peer,
       zlog_info("Creating a new tarpan!");
 
       struct tarpan * tarp = tarpan_new_default();
-//      tarp = tarpan_intern(tarp);
 
-//      attr->tarpan = tarp;
+      // initialize default protocol's information
+      if (tarpan_active_handler)
+	tarpan_active_handler->initialize_packet(peer, tarp);
+
       tarpan_wire = tarp;
 //      SET_FLAG(attr->flag, ATTR_FLAG_BIT (BGP_ATTR_TARPAN));
     }

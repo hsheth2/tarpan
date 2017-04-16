@@ -19,6 +19,12 @@ void wiser_best_selection (struct bgp *bgp, struct bgp_node *rn,
   		    struct bgp_maxpaths_cfg *mpath_cfg,
   		    struct bgp_info_pair *result);
 
+void wiser_packet_received_handler (struct peer *const peer,
+                    struct attr *const attr);
+
+void wiser_initialize_packet (struct peer *const peer,
+                    struct attr *const attr);
+
 // TODO other functions
 
 #endif /* BGPD_WISER_H_ */

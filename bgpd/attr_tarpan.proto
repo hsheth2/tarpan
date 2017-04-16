@@ -2,8 +2,8 @@
 syntax = "proto2";
 
 message Wiser {
-	required int32 a = 1;
-	required int32 b = 2;
+	// start field numbering at 64
+	required int32 cost = 64;
 }
 
 message Pathlets {

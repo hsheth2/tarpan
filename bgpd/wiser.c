@@ -17,11 +17,26 @@ void wiser_protocol_init(void)
 
 struct tarpan_protocol_handler wiser_protocol_handler = {
     .bgp_best_selection = wiser_best_selection,
+    .packet_received_handler = wiser_packet_received_handler,
+    .initialize_packet = wiser_initialize_packet,
 };
+
+void wiser_packet_received_handler (struct peer *const peer,
+                    struct attr *const attr)
+{
+  struct tarpan * tarp = attr->tarpan;
+  // TODO handle the incoming packet
+}
+
+void wiser_initialize_packet (struct peer *const peer,
+                    struct attr *const attr)
+{
+  // TODO initialize wiser packet with costs, etc.
+}
 
 void wiser_best_selection (struct bgp *bgp, struct bgp_node *rn,
   		    struct bgp_maxpaths_cfg *mpath_cfg,
   		    struct bgp_info_pair *result)
 {
-  // nothing here
+  // TODO nothing here
 }
