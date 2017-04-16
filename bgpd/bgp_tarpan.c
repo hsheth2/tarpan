@@ -143,7 +143,7 @@ tarpan_intern (struct tarpan *tarp)
 void
 tarpan_unintern (struct tarpan **tarp)
 {
-  struct tarpan *ret;
+  void *ret;
 
   zlog_debug("tarpan_unintern (*tarp) = %p %lu", (*tarp), (*tarp)->refcnt);
 
@@ -156,7 +156,7 @@ tarpan_unintern (struct tarpan **tarp)
   if ((*tarp)->refcnt == 0)
     {
       /* Tarpan value tarp must exist in hash. */
-      ret = (struct tarp *) hash_release (tarpan_hash, (void*) *tarp);
+      ret = hash_release (tarpan_hash, (void*) *tarp);
       assert (ret != NULL);
 
       tarpan_free (*tarp);
