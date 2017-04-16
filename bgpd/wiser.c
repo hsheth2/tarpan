@@ -6,6 +6,7 @@
  */
 
 #include "bgpd/common.h"
+#include "bgpd/bgp_attr.h"
 #include "bgpd/bgp_tarpan.h"
 #include "bgpd/wiser.h"
 
@@ -29,7 +30,7 @@ void wiser_packet_received_handler (struct peer *const peer,
 }
 
 void wiser_initialize_packet (struct peer *const peer,
-                    struct attr *const attr)
+			      struct tarpan * tarpan)
 {
   // TODO initialize wiser packet with costs, etc.
 }

@@ -39,7 +39,7 @@ struct tarpan_protocol_handler
 
   // called after calling tarpan_new_default
   void (*initialize_packet) (struct peer *const peer,
-                      struct attr *const attr);
+                      struct tarpan * tarpan);
 
   /* optional functions */
   // NONE
