@@ -1102,6 +1102,14 @@ if test -z "$PROTOC_C"; then
   AC_MSG_ERROR([Please install the protobuf-c compiler from https://github.com/protobuf-c/protobuf-c/.])
 fi
 
+dnl ----------
+dnl CPP
+dnl ----------
+AC_CHECK_LIB([stdc++], [__cxa_demangle], [
+AC_DEFINE([HAVE_LIBSTDC__], [1], [we have libstdc++])
+  libstdcxx_LIBS="-lstdc++"], [
+  libstdcxx_LIBS=""])
+AC_SUBST(libstdcxx_LIBS)
 
 dnl --------------------
 dnl Daemon disable check
