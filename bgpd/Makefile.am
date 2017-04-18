@@ -34,7 +34,7 @@ noinst_HEADERS = \
 	bgp_advertise.h bgp_snmp.h bgp_vty.h bgp_mpath.h \
 	bgp_tarpan.h attr_tarpan.pb-c.h wiser.h
 
-bgpd_SOURCES = bgp_main.c
+bgpd_SOURCES = bgp_main.c dummy.cpp
 bgpd_LDADD = libbgp.a ../lib/libzebra.la @LIBCAP@ @LIBM@ -lprotobuf-c @libstdcxx_LIBS@
 
 tarpantest_SOURCES = tarpan_test.cc
