@@ -9,7 +9,7 @@ AM_LDFLAGS = $(PILDFLAGS)
 
 noinst_LIBRARIES = libbgp.a
 #sbin_PROGRAMS = bgpd
-sbin_PROGRAMS = bgpd unittests
+sbin_PROGRAMS = bgpd tarpantest
 
 BUILT_SOURCES = \
 	attr_tarpan.pb-c.c attr_tarpan.pb-c.h
@@ -37,8 +37,8 @@ noinst_HEADERS = \
 bgpd_SOURCES = bgp_main.c
 bgpd_LDADD = libbgp.a ../lib/libzebra.la @LIBCAP@ @LIBM@ -lprotobuf-c @libstdcxx_LIBS@
 
-unittests_SOURCES = tarpan_test.cc
-unittests_LDADD = libbgp.a ../lib/libzebra.la @LIBCAP@ @LIBM@ -lprotobuf-c 
+tarpantest_SOURCES = tarpan_test.cc
+tarpantest_LDADD = libbgp.a ../lib/libzebra.la @LIBCAP@ @LIBM@ -lprotobuf-c 
 
 examplesdir = $(exampledir)
 dist_examples_DATA = bgpd.conf.sample bgpd.conf.sample2
