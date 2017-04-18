@@ -14,7 +14,7 @@ if [ ! -d "protobuf-$PROTOBUF_VERSION" ]; then
 	tar xf protobuf-$PROTOBUF_VERSION.tar.gz
 	( cd protobuf-$PROTOBUF_VERSION && ./configure --prefix=$HOME/protobuf-$PROTOBUF_VERSION-bin && make -j2 )
 fi
-( cd protobuf-$PROTOBUF_VERSION && make install )
+( cd protobuf-$PROTOBUF_VERSION && sudo make install )
 
 
 # install protobuf-c

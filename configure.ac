@@ -780,7 +780,7 @@ AC_CHECK_FUNCS([dup2 ftruncate getcwd gethostbyname getpagesize gettimeofday \
 	if_nametoindex if_indextoname getifaddrs \
 	uname fcntl])
 
-AC_CHECK_FUNCS(setproctitle, ,
+AC_CHECK_FUNCS(setproctitle,,
   [AC_CHECK_LIB(util, setproctitle, 
      [LIBS="$LIBS -lutil"
       AC_DEFINE(HAVE_SETPROCTITLE,, Have setproctitle)
@@ -1102,6 +1102,17 @@ AC_PATH_PROG([PROTOC_C], [protoc-c], [],
 if test -z "$PROTOC_C"; then
   AC_MSG_ERROR([Please install the protobuf-c compiler from https://github.com/protobuf-c/protobuf-c/.])
 fi
+
+dnl -------------------------------
+dnl Protocol buffers
+dnl ------------------------------
+PKG_CHECK_MODULES([PROTOBUF], [protobuf >= 2.4.0])
+AC_SUBST(PROTOBUF_LIBS)
+AC_SUBST(PROTOBUF_CFLAGS)
+AC_SUBST(PROTOBUF_VERSION)
+AC_CHECK_PROG([PROTOC], [protoc], [protoc])
+AS_IF([test "x${PROTOC}" == "x"],
+    [AC_MSG_ERROR([ProtoBuf compiler "protoc" not found.])])
 
 dnl ----------
 dnl CPP
