@@ -13,13 +13,13 @@ cache:
 
 install: 
   - ./install-protobuf
-  - autoheader ; automake --add-missing ; autoreconf -v ; automake --add-missing && autoreconf --force -v
+  - autoreconf --install --force -I m4 -v
   # - ./update-autotools
   # - libtoolize -c
   # - automake --gnu --add-missing --copy
 
 script:
-  - ./configure --disable-doc --enable-vtysh --disable-ripd --disable-ripngd --disable-ospfd --disable-ospf6d --disable-babeld --disable-isisd --disable-opaque-lsa --disable-ospfclient --disable-ospf-te
+  - PKG_CONFIG_PATH=/usr/local/lib/pkgconfig/ ./configure --disable-doc --enable-vtysh --disable-ripd --disable-ripngd --disable-ospfd --disable-ospf6d --disable-babeld --disable-isisd --disable-opaque-lsa --disable-ospfclient --disable-ospf-te
   - sudo chmod -R 777 /var/run && sudo chmod -R 777 /usr/local/etc
   - make && sudo make install
 
