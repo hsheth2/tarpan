@@ -1,9 +1,14 @@
 // works with only proto2
 syntax = "proto2";
 
+message IPAddress {
+	repeated uint32 bytes = 1 [packed=true]; // only 8-bits of each will be used
+}
+
 message Wiser {
 	// start field numbering at 64
-	required int32 cost = 64;
+	required uint32 path_cost = 64;
+	required IPAddress sender_address = 65; // used for contacting the cost portal
 }
 
 message Pathlets {
@@ -11,8 +16,8 @@ message Pathlets {
 }
 
 message TarpanMsg {
-	// reserving tags 1-31 for internal use
-	required int32 version = 1;
+	// reserving tags 1-31 for tarpan internal use
+	required uint32 version = 1;
 
 	optional Wiser wiser = 32;
 	optional Pathlets pathlets = 33;
