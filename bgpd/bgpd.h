@@ -371,6 +371,8 @@ struct peer
 #define PEER_CAP_RESTART_BIT_ADV            (1 << 9) /* sent restart state */
 #define PEER_CAP_RESTART_BIT_RCV            (1 << 10) /* peer restart state */
 
+  // TODO (tarpan) determine if the peer supports tarpan and/or specific protocols
+
   /* Capability flags (reset in bgp_stop) */
   u_int16_t af_cap[AFI_MAX][SAFI_MAX];
 #define PEER_CAP_ORF_PREFIX_SM_ADV          (1 << 0) /* send-mode advertised */

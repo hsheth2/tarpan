@@ -12,8 +12,9 @@
 
 void wiser_protocol_init(void)
 {
-  // nothing for now;
-  // in the future, this should initialize any routing tables/etc.
+  // TODO initialize wiser costs table (both send and recv)
+
+  // TODO open cost portal
 }
 
 struct tarpan_protocol_handler wiser_protocol_handler = {
@@ -32,7 +33,9 @@ void wiser_packet_received_handler (struct peer *const peer,
 void wiser_initialize_packet (struct peer *const peer,
 			      struct tarpan * tarpan)
 {
-  // TODO initialize wiser packet with costs, etc.
+  // TODO place wiser's cost to destination
+
+  // TODO place this node's IP address
 }
 
 void wiser_best_selection (struct bgp *bgp, struct bgp_node *rn,
