@@ -27,6 +27,16 @@ void wiser_packet_received_handler (struct peer *const peer,
                     struct attr *const attr)
 {
   struct tarpan * tarp = attr->tarpan;
+
+  if (!tarp->message->wiser)
+    {
+      // the incoming packet does not have wiser data
+      return;
+    }
+
+  // TODO determine if the packet was sent via a gulf,
+  // or if it was sent directly (within same island)
+
   // TODO handle the incoming packet
 }
 
@@ -34,8 +44,9 @@ void wiser_initialize_packet (struct peer *const peer,
 			      struct tarpan * tarpan)
 {
   // TODO place wiser's cost to destination
+  // TODO update cost portal data
 
-  // TODO place this node's IP address
+  // TODO place this node's IP address in wiser data
 }
 
 void wiser_best_selection (struct bgp *bgp, struct bgp_node *rn,
