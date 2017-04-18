@@ -47,21 +47,6 @@ tarpan_new (void)
   return tarp;
 }
 
-struct tarpan *
-tarpan_new_default (void)
-{
-  struct tarpan * tarp = (struct tarpan *) XCALLOC (MTYPE_TARPAN,
-						       sizeof (struct tarpan));
-
-  tarp->message = malloc(sizeof(TarpanMsg));
-  tarpan_msg__init(tarp->message);
-  tarp->message->version = 12;
-
-  zlog_debug("tarpan_new_default %p %lu", tarp, tarp->refcnt);
-
-  return tarp;
-}
-
 /* Make hash value of tarpan attribute. This function is used by
    hash package.*/
 unsigned int
@@ -74,33 +59,10 @@ tarpan_hash_make (struct tarpan * tarpan)
 int
 tarpan_cmp (const struct tarpan *p1, const struct tarpan *p2)
 {
-  if (p1->message == p2->message) // compare pointers
+  if (tarpan_hash_make(p1) == tarpan_hash_make(p2)) // compare hashes (pointers)
     return 1;
   else
     return 0;
-}
-
-struct tarpan *
-tarpan_parse (u_int8_t *pnt, u_short length)
-{
-  // work our protobuf magic
-  struct tarpan* tmp = tarpan_new();
-
-  TarpanMsg *msg = tarpan_msg__unpack(NULL, length, pnt);
-  if (msg == NULL) {
-      zlog_err("tarpan: AAAAAAAAH!");
-  }
-  assert(msg != NULL);
-
-  tmp->message = msg;
-
-  zlog_info("Received tarpan packet, version %d", msg->version);
-
-  struct tarpan * ret = tarpan_intern(tmp);
-
-  zlog_debug("tarpan_parse ret = %p %lu", ret, ret->refcnt);
-
-  return ret;
 }
 
 void
@@ -184,5 +146,41 @@ tarpan_finish (void)
 {
   hash_free (tarpan_hash);
   tarpan_hash = NULL;
+}
+
+// end low-level interning/memory stuff
+
+void tarpan_initialize_packet (struct peer *const peer, struct tarpan * tarp)
+{
+  tarp->message = malloc(sizeof(TarpanMsg));
+  tarpan_msg__init(tarp->message);
+  tarp->message->version = 12;
+
+  // initialize default protocol's information
+  if (tarpan_active_handler)
+    tarpan_active_handler->initialize_packet(peer, tarp);
+}
+
+struct tarpan *
+tarpan_parse (u_int8_t *pnt, u_short length)
+{
+  // work our protobuf magic
+  struct tarpan* tmp = tarpan_new();
+
+  TarpanMsg *msg = tarpan_msg__unpack(NULL, length, pnt);
+  if (msg == NULL) {
+      zlog_err("tarpan: AAAAAAAAH!");
+  }
+  assert(msg != NULL);
+
+  tmp->message = msg;
+
+  zlog_info("Received tarpan packet, version %d", msg->version);
+
+  struct tarpan * ret = tarpan_intern(tmp);
+
+  zlog_debug("tarpan_parse ret = %p %lu", ret, ret->refcnt);
+
+  return ret;
 }
 

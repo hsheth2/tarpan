@@ -2486,11 +2486,8 @@ bgp_packet_attribute (struct bgp *bgp, struct peer *peer,
       // create a new tarpan attribute
       zlog_info("Creating a new tarpan!");
 
-      struct tarpan * tarp = tarpan_new_default();
-
-      // initialize default protocol's information
-      if (tarpan_active_handler)
-	tarpan_active_handler->initialize_packet(peer, tarp);
+      struct tarpan * tarp = tarpan_new();
+      tarpan_initialize_packet(peer, tarp);
 
       tarpan_wire = tarp;
 //      SET_FLAG(attr->flag, ATTR_FLAG_BIT (BGP_ATTR_TARPAN));
