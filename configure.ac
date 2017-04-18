@@ -67,9 +67,9 @@ dnl --------------------
 dnl Check CC and friends
 dnl --------------------
 AC_LANG([C])
-AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_CPP
+AC_PROG_CC
 AM_PROG_CC_C_O
 AC_PROG_EGREP
 CXXFLAGS="-fpic -shared ${CXXFLAGS}"
@@ -1105,6 +1105,7 @@ fi
 dnl ----------
 dnl CPP
 dnl ----------
+dnl AX_CXX_COMPILE_STDCXX_11 #([mandatory])
 AC_CHECK_LIB([stdc++], [__cxa_demangle], [
 AC_DEFINE([HAVE_LIBSTDC__], [1], [we have libstdc++])
   libstdcxx_LIBS="-lstdc++"], [
