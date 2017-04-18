@@ -4,11 +4,12 @@ AM_CPPFLAGS = -I.. -I$(top_srcdir) -I$(top_srcdir)/lib -I$(top_builddir)/lib
 DEFS = @DEFS@ -DSYSCONFDIR=\"$(sysconfdir)/\"
 INSTALL_SDATA=@INSTALL@ -m 600
 
-AM_CFLAGS = $(PICFLAGS)
+AM_CFLAGS = '-fPIC' $(PICFLAGS)
 AM_LDFLAGS = $(PILDFLAGS)
 
 noinst_LIBRARIES = libbgp.a
-sbin_PROGRAMS = bgpd
+#sbin_PROGRAMS = bgpd
+sbin_PROGRAMS = bgpd unittests
 
 BUILT_SOURCES = \
 	attr_tarpan.pb-c.c attr_tarpan.pb-c.h
@@ -35,6 +36,9 @@ noinst_HEADERS = \
 
 bgpd_SOURCES = bgp_main.c
 bgpd_LDADD = libbgp.a ../lib/libzebra.la @LIBCAP@ @LIBM@ -lprotobuf-c @libstdcxx_LIBS@
+
+unittests_SOURCES = tarpan_test.cc
+unittests_LDADD = libbgp.a ../lib/libzebra.la @LIBCAP@ @LIBM@ -lprotobuf-c 
 
 examplesdir = $(exampledir)
 dist_examples_DATA = bgpd.conf.sample bgpd.conf.sample2

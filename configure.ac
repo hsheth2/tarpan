@@ -67,9 +67,10 @@ dnl --------------------
 dnl Check CC and friends
 dnl --------------------
 AC_LANG([C])
+AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_CPP
-AC_PROG_CC
+AC_REQUIRE_CPP
 AM_PROG_CC_C_O
 AC_PROG_EGREP
 CXXFLAGS="-fpic -shared ${CXXFLAGS}"
