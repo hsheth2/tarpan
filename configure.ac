@@ -1106,13 +1106,13 @@ fi
 dnl -------------------------------
 dnl Protocol buffers
 dnl ------------------------------
-PKG_CHECK_MODULES([PROTOBUF], [protobuf >= 2.4.0])
-AC_SUBST(PROTOBUF_LIBS)
-AC_SUBST(PROTOBUF_CFLAGS)
-AC_SUBST(PROTOBUF_VERSION)
-AC_CHECK_PROG([PROTOC], [protoc], [protoc])
-AS_IF([test "x${PROTOC}" == "x"],
-    [AC_MSG_ERROR([ProtoBuf compiler "protoc" not found.])])
+dnl PKG_CHECK_MODULES([PROTOBUF], [protobuf >= 2.4.0])
+dnl AC_SUBST(PROTOBUF_LIBS)
+dnl AC_SUBST(PROTOBUF_CFLAGS)
+dnl AC_SUBST(PROTOBUF_VERSION)
+dnl AC_CHECK_PROG([PROTOC], [protoc], [protoc])
+dnl AS_IF([test "x${PROTOC}" == "x"],
+dnl     [AC_MSG_ERROR([ProtoBuf compiler "protoc" not found.])])
 
 dnl ----------
 dnl CPP

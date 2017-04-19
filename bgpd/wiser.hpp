@@ -8,6 +8,8 @@
 #ifndef BGPD_WISER_HPP_
 #define BGPD_WISER_HPP_
 
+// note: no CXX allowed in this file
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -29,13 +31,10 @@ void wiser_packet_received_handler (struct peer *const peer,
 void wiser_initialize_packet (struct peer *const peer,
 			      struct tarpan * tarpan);
 
-// TODO other functions
+// TODO other function declarations
 
 #ifdef __cplusplus
 }
-
-// TODO other C++ stuff in here
-
 #endif
 
 #endif /* BGPD_WISER_HPP_ */

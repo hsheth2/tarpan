@@ -5,15 +5,24 @@
  *      Author: hsheth
  */
 
-#include "wiser.hpp"
-
 extern "C" {
 
+#define new avoid_cxx_new_keyword
+#include "wiser.hpp"
 #include "bgpd/common.h"
 #include "bgpd/bgp_attr.h"
 #include "bgpd/bgp_tarpan.h"
 
 }
+
+// C++
+
+// C++11 does not support designated initializers
+struct tarpan_protocol_handler wiser_protocol_handler = {
+    /*.bgp_best_selection =*/ wiser_best_selection,
+    /*.packet_received_handler =*/ wiser_packet_received_handler,
+    /*.initialize_packet =*/ wiser_initialize_packet,
+};
 
 void wiser_protocol_init(void)
 {
@@ -21,12 +30,6 @@ void wiser_protocol_init(void)
 
   // TODO open cost portal
 }
-
-struct tarpan_protocol_handler wiser_protocol_handler = {
-    .bgp_best_selection = wiser_best_selection,
-    .packet_received_handler = wiser_packet_received_handler,
-    .initialize_packet = wiser_initialize_packet,
-};
 
 void wiser_packet_received_handler (struct peer *const peer,
                     struct attr *const attr)
