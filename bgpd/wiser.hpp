@@ -12,7 +12,7 @@
 #include "bgpd/bgp_tarpan.h"
 
 #ifdef __cplusplus
-extern "c" {
+extern "C" {
 #endif
 
 extern struct tarpan_protocol_handler wiser_protocol_handler;
