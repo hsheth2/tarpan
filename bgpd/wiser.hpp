@@ -8,12 +8,12 @@
 #ifndef BGPD_WISER_HPP_
 #define BGPD_WISER_HPP_
 
-#include "bgpd/common.h"
-#include "bgpd/bgp_tarpan.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include "bgpd/common.h"
+#include "bgpd/bgp_tarpan.h"
 
 extern struct tarpan_protocol_handler wiser_protocol_handler;
 

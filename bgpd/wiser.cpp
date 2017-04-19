@@ -7,9 +7,13 @@
 
 #include "wiser.hpp"
 
+extern "C" {
+
 #include "bgpd/common.h"
 #include "bgpd/bgp_attr.h"
 #include "bgpd/bgp_tarpan.h"
+
+}
 
 void wiser_protocol_init(void)
 {
