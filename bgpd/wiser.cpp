@@ -5,10 +5,11 @@
  *      Author: hsheth
  */
 
+#include "wiser.hpp"
+
 #include "bgpd/common.h"
 #include "bgpd/bgp_attr.h"
 #include "bgpd/bgp_tarpan.h"
-#include "bgpd/wiser.h"
 
 void wiser_protocol_init(void)
 {

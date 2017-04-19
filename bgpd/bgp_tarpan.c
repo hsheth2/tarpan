@@ -16,7 +16,7 @@
 #include "bgpd/attr_tarpan.pb-c.h"
 
 // include possible protocols
-#include "wiser.h"
+#include "wiser.hpp"
 // protocol initialization functions are called and
 // active protocol is  set in `tarpan_protocol_init`
 

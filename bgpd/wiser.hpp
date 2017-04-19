@@ -5,11 +5,15 @@
  *      Author: hsheth
  */
 
-#ifndef BGPD_WISER_H_
-#define BGPD_WISER_H_
+#ifndef BGPD_WISER_HPP_
+#define BGPD_WISER_HPP_
 
 #include "bgpd/common.h"
 #include "bgpd/bgp_tarpan.h"
+
+#ifdef __cplusplus
+extern "c" {
+#endif
 
 extern struct tarpan_protocol_handler wiser_protocol_handler;
 
@@ -27,4 +31,11 @@ void wiser_initialize_packet (struct peer *const peer,
 
 // TODO other functions
 
-#endif /* BGPD_WISER_H_ */
+#ifdef __cplusplus
+}
+
+// TODO other C++ stuff in here
+
+#endif
+
+#endif /* BGPD_WISER_HPP_ */
