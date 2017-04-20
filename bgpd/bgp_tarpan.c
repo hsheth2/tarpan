@@ -31,6 +31,8 @@ void tarpan_set_protocol_handler(struct tarpan_protocol_handler * handler) {
 
 void tarpan_protocol_init(void)
 {
+  zlog_debug("tarpan_protocol_init");
+
   wiser_protocol_init();
 
   tarpan_set_protocol_handler(&wiser_protocol_handler);
