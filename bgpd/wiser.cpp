@@ -9,6 +9,9 @@
 // C++ includes
 #include <fstream>
 #include <map>
+#include <unordered_map>
+#include <utility>
+#include <cmath>
 
 extern "C" {
 // https://gcc.gnu.org/ml/gcc-help/2011-01/msg00052.html
@@ -33,14 +36,41 @@ struct tarpan_protocol_handler wiser_protocol_handler = {
     .initialize_packet = wiser_initialize_packet,
 };
 
-void wiser_costs_table_init();
+static std::unordered_map<std::pair<int, int>, int> path_costs;
 
 void wiser_protocol_init(void)
 {
   zlog_info("wiser_protocol_init: starting");
 
-  // TODO read costs file
+  // read in path costs file
+  std::ifstream wiser_configuration("/etc/quagga/wiser.conf");
+  std::string line;
+  while (std::getline(wiser_configuration, line)) {
+      if (line.length() == 0) {
+	  continue;
+      }
 
+      if (line[0] == '#') {
+	  // comment
+	  continue;
+      }
+
+      std::istringstream iss(line);
+      std::string directive;
+      iss >> directive;
+
+      if (directive == "path_cost") {
+	  int as1, as2, cost;
+	  iss >> as1 >> as2 >> cost;
+
+	  std::pair<int, int> as_pair = std::make_pair(std::min(as1, as2), std::max(as1, as2));
+	  path_costs.insert(make_pair(as_pair, cost));
+      } else {
+	  zlog_err("Unknown directive %s", directive.c_str());
+      }
+  }
+
+  // initialize wiser costs table (both send and recv)
   wiser_costs_table_init();
 
   // TODO open cost portal
