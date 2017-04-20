@@ -37,17 +37,9 @@ struct tarpan_protocol_handler wiser_protocol_handler = {
     .initialize_packet = wiser_initialize_packet,
 };
 
+void wiser_costs_table_init();
+
 static std::unordered_map<uint64_t, int> path_costs;
-
-static std::map<as_t, uint32_t> advcost_sent;
-static std::map<as_t, uint32_t> advcost_recv;
-
-// initialize wiser costs table (both send and recv)
-void wiser_costs_table_init()
-{
-  advcost_sent.clear();
-  advcost_recv.clear();
-}
 
 void wiser_protocol_init(void)
 {
@@ -85,6 +77,16 @@ void wiser_protocol_init(void)
   wiser_costs_table_init();
 
   // TODO open cost portal
+}
+
+static std::map<as_t, uint32_t> advcost_sent;
+static std::map<as_t, uint32_t> advcost_recv;
+
+// initialize wiser costs table (both send and recv)
+void wiser_costs_table_init()
+{
+  advcost_sent.clear();
+  advcost_recv.clear();
 }
 
 static int wiser_get_path_cost(int as1, int as2) {
