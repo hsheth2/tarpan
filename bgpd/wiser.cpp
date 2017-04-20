@@ -7,15 +7,13 @@
  */
 
 extern "C" {
-
 // https://gcc.gnu.org/ml/gcc-help/2011-01/msg00052.html
 #define new avoid_cxx_new_keyword
 
-#include "wiser.h"
+#include "bgpd/wiser.h"
 #include "bgpd/common.h"
 #include "bgpd/bgp_attr.h"
 #include "bgpd/bgp_tarpan.h"
-
 }
 
 // C++
@@ -29,6 +27,8 @@ struct tarpan_protocol_handler wiser_protocol_handler = {
 
 void wiser_protocol_init(void)
 {
+  zlog_info("wiser_protocol_init: starting");
+
   // TODO initialize wiser costs table (both send and recv)
 
   // TODO open cost portal

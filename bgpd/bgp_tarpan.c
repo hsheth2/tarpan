@@ -16,7 +16,7 @@
 #include "bgpd/attr_tarpan.pb-c.h"
 
 // include possible protocols
-#include "wiser.h"
+#include "bgpd/wiser.h"
 // protocol initialization functions are called and
 // active protocol is  set in `tarpan_protocol_init`
 
@@ -50,7 +50,7 @@ tarpan_new (void)
 /* Make hash value of tarpan attribute. This function is used by
    hash package.*/
 unsigned int
-tarpan_hash_make (struct tarpan * tarpan)
+tarpan_hash_make (const struct tarpan * tarpan)
 {
   zlog_debug("tarpan_hash_make %p %lu", tarpan, tarpan->refcnt);
   return (uintptr_t) tarpan->message;

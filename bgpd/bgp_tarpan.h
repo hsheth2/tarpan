@@ -63,7 +63,7 @@ extern struct tarpan *tarpan_parse (u_int8_t *, u_short);
 extern struct tarpan *tarpan_intern (struct tarpan *);
 extern void tarpan_unintern (struct tarpan **);
 extern char *tarpan_str (struct tarpan *); // (only needed for debugging)
-extern unsigned int tarpan_hash_make (struct tarpan *);
+extern unsigned int tarpan_hash_make (const struct tarpan *);
 extern int tarpan_match (const struct tarpan *, const struct tarpan *);
 extern int tarpan_cmp (const struct tarpan *, const struct tarpan *);
 extern struct tarpan *tarpan_merge (struct tarpan *, struct tarpan *);
