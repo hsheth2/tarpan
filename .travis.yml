@@ -9,14 +9,15 @@ cache:
 
 before_install:
   - sudo apt-get -qq update
-  - sudo apt-get install -y pkg-config gawk libreadline-dev autoconf automake bison byacc flex help2man texinfo libc-ares-dev wget xz-utils curl make libtool libprotobuf-dev protobuf-compiler libreadline6-dev
+  - sudo apt-get install -y software-properties-common python-software-properties
+  - DEBIAN_FRONTEND=noninteractive sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+  - sudo apt-get -qq update
+  - sudo apt-get install -y pkg-config gawk libreadline-dev autoconf automake bison byacc flex help2man texinfo libc-ares-dev wget xz-utils curl make libtool libprotobuf-dev protobuf-compiler libreadline6-dev gcc-4.9 g++-4.9
+  - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.9 60 --slave /usr/bin/g++ g++ /usr/bin/g++-4.9
 
 install: 
   - ./install-protobuf
   - autoreconf --install --force -I m4 -v
-  # - ./update-autotools
-  # - libtoolize -c
-  # - automake --gnu --add-missing --copy
 
 script:
   - ./configure --disable-doc --enable-vtysh --disable-ripd --disable-ripngd --disable-ospfd --disable-ospf6d --disable-babeld --disable-isisd --disable-opaque-lsa --disable-ospfclient --disable-ospf-te
