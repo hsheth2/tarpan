@@ -26,11 +26,11 @@ extern "C" {
 // C++ code
 
 
-// C++11 does not support designated initializers
+// C++14 does  support designated initializers
 struct tarpan_protocol_handler wiser_protocol_handler = {
-    /*.bgp_best_selection =*/ wiser_best_selection,
-    /*.packet_received_handler =*/ wiser_packet_received_handler,
-    /*.initialize_packet =*/ wiser_initialize_packet,
+    .bgp_best_selection = wiser_best_selection,
+    .packet_received_handler = wiser_packet_received_handler,
+    .initialize_packet = wiser_initialize_packet,
 };
 
 void wiser_protocol_init(void)
