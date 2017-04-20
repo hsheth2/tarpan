@@ -11,6 +11,7 @@
 #include <map>
 #include <unordered_map>
 #include <utility>
+#include <sstream>
 #include <cmath>
 
 extern "C" {
@@ -36,7 +37,7 @@ struct tarpan_protocol_handler wiser_protocol_handler = {
     .initialize_packet = wiser_initialize_packet,
 };
 
-static std::unordered_map<std::pair<int, int>, int> path_costs;
+static std::unordered_map<uint64_t, int> path_costs;
 
 void wiser_protocol_init(void)
 {
@@ -64,14 +65,19 @@ void wiser_protocol_init(void)
 	  int as1, as2, cost;
 	  iss >> as1 >> as2 >> cost;
 
-	  std::pair<int, int> as_pair = std::make_pair(std::min(as1, as2), std::max(as1, as2));
-	  path_costs.insert(make_pair(as_pair, cost));
+	  uint64_t as_pair = (uint64_t) std::min(as1, as2) << 32 | std::max(as1, as2);
+	  path_costs.insert(std::make_pair(as_pair, cost));
       } else {
 	  zlog_err("Unknown directive %s", directive.c_str());
       }
   }
 
   // TODO open cost portal
+}
+
+static int wiser_get_path_cost(int as1, int as2) {
+  uint64_t as_pair = (uint64_t) std::min(as1, as2) << 32 | std::max(as1, as2);
+  return path_costs[as_pair];
 }
 
 void wiser_packet_received_handler (struct peer *const peer,
