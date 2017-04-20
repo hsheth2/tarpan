@@ -53,7 +53,7 @@ void wiser_protocol_init(void)
 {
   zlog_info("wiser_protocol_init: starting");
 
-  tarpan_active_handler = &wiser_protocol_handler;
+  tarpan_set_protocol_handler(&wiser_protocol_handler);
 
   // read in path costs file
   std::ifstream wiser_configuration("/etc/quagga/wiser.conf");
