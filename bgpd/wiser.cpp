@@ -39,6 +39,16 @@ struct tarpan_protocol_handler wiser_protocol_handler = {
 
 static std::unordered_map<uint64_t, int> path_costs;
 
+static std::map<as_t, uint32_t> advcost_sent;
+static std::map<as_t, uint32_t> advcost_recv;
+
+// initialize wiser costs table (both send and recv)
+void wiser_costs_table_init()
+{
+  advcost_sent.clear();
+  advcost_recv.clear();
+}
+
 void wiser_protocol_init(void)
 {
   zlog_info("wiser_protocol_init: starting");
@@ -80,16 +90,6 @@ void wiser_protocol_init(void)
 static int wiser_get_path_cost(int as1, int as2) {
   uint64_t as_pair = (uint64_t) std::min(as1, as2) << 32 | std::max(as1, as2);
   return path_costs[as_pair];
-}
-
-static std::map<as_t, uint32_t> advcost_sent;
-static std::map<as_t, uint32_t> advcost_recv;
-
-// initialize wiser costs table (both send and recv)
-void wiser_costs_table_init()
-{
-  advcost_sent.clear();
-  advcost_recv.clear();
 }
 
 void increment_map_value(std::map<as_t, uint32_t>& map, as_t key, uint32_t delta)
