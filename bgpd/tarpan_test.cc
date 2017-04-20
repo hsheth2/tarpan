@@ -14,6 +14,8 @@ extern "C" {
 
 #include "bgpd/bgp_tarpan.h"
 #include "bgpd/wiser.h"
+
+#undef new
 }
 
 int main(int argc, char **argv) {

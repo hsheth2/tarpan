@@ -6,6 +6,10 @@
  *      Author: hsheth
  */
 
+// C++ includes
+#include <fstream>
+#include <map>
+
 extern "C" {
 // https://gcc.gnu.org/ml/gcc-help/2011-01/msg00052.html
 #define new avoid_cxx_new_keyword
@@ -14,9 +18,13 @@ extern "C" {
 #include "bgpd/common.h"
 #include "bgpd/bgp_attr.h"
 #include "bgpd/bgp_tarpan.h"
+#include "bgpd/attr_tarpan.pb-c.h"
+
+#undef new
 }
 
-// C++
+// C++ code
+
 
 // C++11 does not support designated initializers
 struct tarpan_protocol_handler wiser_protocol_handler = {
@@ -54,6 +62,12 @@ void wiser_packet_received_handler (struct peer *const peer,
 void wiser_initialize_packet (struct peer *const peer,
 			      struct tarpan * tarpan)
 {
+  Wiser* wiser = (Wiser*) malloc(sizeof(Wiser));
+  wiser__init(wiser);
+  tarpan->message->wiser = wiser;
+
+  wiser->path_cost = 5; // TODO: lookup in static file
+
   // TODO place wiser's cost to destination
   // TODO update cost portal data
 
