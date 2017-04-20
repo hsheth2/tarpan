@@ -53,10 +53,23 @@ void wiser_packet_received_handler (struct peer *const peer,
       return;
     }
 
-  // TODO determine if the packet was sent via a gulf,
-  // or if it was sent directly (within same island)
+  Wiser* wiser = tarp->message->wiser;
 
-  // TODO handle the incoming packet
+  zlog_debug("wiser_packet_received_handler");
+
+  // determine if the packet was sent via a gulf,
+  // or if it was sent directly (within same island)
+  as_t my_as = peer->bgp->as;
+  as_t intended_as = wiser->sender_as;
+
+  if (my_as == intended_as) {
+      // not over a gulf
+  } else {
+      // over a gulf
+      // TODO must contact cost portal
+  }
+
+  // TODO update cost portal data
 }
 
 void wiser_initialize_packet (struct peer *const peer,
@@ -66,12 +79,22 @@ void wiser_initialize_packet (struct peer *const peer,
   wiser__init(wiser);
   tarpan->message->wiser = wiser;
 
+  struct in_addr local_ip = peer->bgp->router_id;
+  as_t as_number = peer->bgp->as;
+
   wiser->path_cost = 5; // TODO: lookup in static file
 
-  // TODO place wiser's cost to destination
   // TODO update cost portal data
 
-  // TODO place this node's IP address in wiser data
+  zlog_debug("wiser_initialize_packet");
+
+  // place this node's AS/IP address in wiser data
+  IPAddress* local_addr = (IPAddress*) malloc(sizeof(IPAddress));
+  ipaddress__init(local_addr);
+  local_addr->bytes = local_ip.s_addr;
+
+  wiser->sender_as = as_number;
+  wiser->sender_address = local_addr;
 }
 
 void wiser_best_selection (struct bgp *bgp, struct bgp_node *rn,

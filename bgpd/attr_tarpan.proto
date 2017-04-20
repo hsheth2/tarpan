@@ -2,13 +2,16 @@
 syntax = "proto2";
 
 message IPAddress {
-	repeated uint32 bytes = 1 [packed=true]; // only 8-bits of each will be used
+	required uint32 bytes = 1;
+	// TODO: IPv6 support?
 }
 
 message Wiser {
 	// start field numbering at 64
 	required uint32 path_cost = 64;
-	required IPAddress sender_address = 65; // used for contacting the cost portal
+	
+	required uint32 sender_as = 65;
+	required IPAddress sender_address = 66; // used for contacting the cost portal
 }
 
 message Pathlets {
