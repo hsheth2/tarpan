@@ -32,7 +32,7 @@ noinst_HEADERS = \
 	bgpd.h bgp_filter.h bgp_clist.h bgp_dump.h bgp_zebra.h \
 	bgp_ecommunity.h bgp_mplsvpn.h bgp_nexthop.h bgp_damp.h bgp_table.h \
 	bgp_advertise.h bgp_snmp.h bgp_vty.h bgp_mpath.h \
-	bgp_tarpan.h attr_tarpan.pb-c.h wiser.hpp
+	bgp_tarpan.h attr_tarpan.pb-c.h wiser.h
 
 bgpd_SOURCES = bgp_main.c bgpd_force_cpp.cpp
 bgpd_LDADD = libbgp.a ../lib/libzebra.la @LIBCAP@ @LIBM@ -lprotobuf-c @libstdcxx_LIBS@

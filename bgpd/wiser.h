@@ -5,8 +5,8 @@
  *      Author: hsheth
  */
 
-#ifndef BGPD_WISER_HPP_
-#define BGPD_WISER_HPP_
+#ifndef BGPD_WISER_H_
+#define BGPD_WISER_H_
 
 // note: no CXX allowed in this file
 
@@ -37,4 +37,4 @@ void wiser_initialize_packet (struct peer *const peer,
 }
 #endif
 
-#endif /* BGPD_WISER_HPP_ */
+#endif /* BGPD_WISER_H_ */
