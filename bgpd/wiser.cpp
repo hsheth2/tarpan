@@ -18,6 +18,7 @@ extern "C" {
 // https://gcc.gnu.org/ml/gcc-help/2011-01/msg00052.html
 #define new avoid_cxx_new_keyword
 
+#include "log.h"
 #include "bgpd/wiser.h"
 #include "bgpd/common.h"
 #include "bgpd/bgp_attr.h"

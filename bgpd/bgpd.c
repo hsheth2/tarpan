@@ -58,7 +58,6 @@ Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 #include "bgpd/bgp_network.h"
 #include "bgpd/bgp_vty.h"
 #include "bgpd/bgp_mpath.h"
-#include "bgpd/bgp_tarpan.h"
 #ifdef HAVE_SNMP
 #include "bgpd/bgp_snmp.h"
 #endif /* HAVE_SNMP */
