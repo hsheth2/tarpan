@@ -84,8 +84,8 @@ void wiser_protocol_init(void)
   // TODO open cost portal
 }
 
-static std::map<as_t, uint32_t> advcost_sent;
-static std::map<as_t, uint32_t> advcost_recv;
+static std::unordered_map<as_t, uint32_t> advcost_sent;
+static std::unordered_map<as_t, uint32_t> advcost_recv;
 
 // initialize wiser costs table (both send and recv)
 void wiser_costs_table_init()
@@ -99,7 +99,7 @@ static int wiser_get_path_cost(int as1, int as2) {
   return path_costs[as_pair];
 }
 
-static void increment_map_value(std::map<as_t, uint32_t>& map, as_t key, uint32_t delta)
+static void increment_map_value(std::unordered_map<as_t, uint32_t>& map, as_t key, uint32_t delta)
 {
   auto find = map.find(key);
 
