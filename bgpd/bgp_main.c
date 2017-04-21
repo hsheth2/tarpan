@@ -445,6 +445,8 @@ main (int argc, char **argv)
       return (1);
     }
 
+  /* init tarpan */
+  tarpan_protocol_init ();
 
   /* Process ID file creation. */
   pid_output (pid_file);
