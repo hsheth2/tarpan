@@ -71,7 +71,7 @@ void wiser_protocol_init(void)
       iss >> directive;
 
       if (directive == "path_cost") {
-	  int as1, as2, cost;
+	  uint32_t as1, as2, cost;
 	  iss >> as1 >> as2 >> cost;
 
 	  uint64_t as_pair = (uint64_t) std::min(as1, as2) << 32 | std::max(as1, as2);
