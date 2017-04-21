@@ -63,7 +63,7 @@ void wiser_protocol_init(void)
       std::string directive;
       iss >> directive;
 
-      zlog_debug("Found directive: $s", directive.c_str());
+      zlog_debug("Found directive: %s", directive.c_str());
 
       if (directive == "path_cost") {
 	  uint32_t as1, as2, cost;
