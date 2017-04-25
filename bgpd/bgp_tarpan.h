@@ -13,6 +13,8 @@
 #include "bgpd/common.h"
 #include "bgpd/attr_tarpan.pb-c.h"
 
+#define TARPAN_VERSION 12
+
 /* Tarpan attribute */
 struct tarpan
 {

@@ -156,7 +156,7 @@ void tarpan_initialize_packet (struct peer *const peer, struct tarpan * tarp)
 {
   tarp->message = malloc(sizeof(TarpanMsg));
   tarpan_msg__init(tarp->message);
-  tarp->message->version = 12;
+  tarp->message->version = TARPAN_VERSION;
 
   // initialize default protocol's information
   if (tarpan_active_handler)
