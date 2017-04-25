@@ -30,12 +30,12 @@ extern "C" {
 
 // C++ code
 
-
-// C++14 does  support designated initializers
+// C++14 does support designated initializers
 struct tarpan_protocol_handler wiser_protocol_handler = {
     .bgp_best_selection = wiser_best_selection,
     .packet_received_handler = wiser_packet_received_handler,
     .initialize_packet = wiser_initialize_packet,
+    .update_packet = wiser_update_packet,
 };
 
 void wiser_costs_table_init();
@@ -164,7 +164,7 @@ void wiser_initialize_packet (struct peer *const peer,
   wiser__init(wiser);
   tarpan->message->wiser = wiser;
 
-  wiser->path_cost = 5; // TODO: lookup in static file
+  wiser->path_cost = wiser_get_path_cost(peer->bgp->as, peer->as);
 
   update_sent_cost(peer->as, wiser->path_cost);
 
@@ -179,8 +179,19 @@ void wiser_initialize_packet (struct peer *const peer,
   wiser->sender_address = local_addr;
 }
 
-// TODO wiser_forward_packet (or something)
-// ^ should use normalization?
+void wiser_update_packet (struct peer *const peer,
+			  struct tarpan * tarpan)
+{
+  if (!tarpan->message->wiser) {
+      wiser_initialize_packet(peer, tarpan);
+      return;
+  }
+
+  // TODO normalize previous path cost
+  uint32_t my_segment_cost = wiser_get_path_cost(peer->bgp->as, peer->as);
+
+  // TODO wiser_update_packet
+}
 
 void wiser_best_selection (struct bgp *bgp, struct bgp_node *rn,
   		    struct bgp_maxpaths_cfg *mpath_cfg,

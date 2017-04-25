@@ -41,6 +41,10 @@ struct tarpan_protocol_handler
   void (*initialize_packet) (struct peer *const peer,
                       struct tarpan * tarpan);
 
+  // called when forwarding an existing tarpan attribute
+  void (*update_packet) (struct peer *const peer,
+  			 struct tarpan * tarpan);
+
   /* optional functions */
   // NONE
 };

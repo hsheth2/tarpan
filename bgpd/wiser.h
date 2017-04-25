@@ -31,7 +31,8 @@ void wiser_packet_received_handler (struct peer *const peer,
 void wiser_initialize_packet (struct peer *const peer,
 			      struct tarpan * tarpan);
 
-// TODO other function declarations
+void wiser_update_packet (struct peer *const peer,
+			  struct tarpan * tarpan);
 
 #ifdef __cplusplus
 }
