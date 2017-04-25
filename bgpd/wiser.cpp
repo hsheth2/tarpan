@@ -7,11 +7,8 @@
  */
 
 // C++ includes
-#include <fstream>
 #include <map>
-#include <unordered_map>
 #include <utility>
-#include <sstream>
 #include <cmath>
 
 extern "C" {
@@ -29,6 +26,7 @@ extern "C" {
 }
 
 // C++ code
+#include "bgpd/wiser_static_path_costs.hpp"
 
 // C++14 does support designated initializers
 struct tarpan_protocol_handler wiser_protocol_handler = {
@@ -40,43 +38,12 @@ struct tarpan_protocol_handler wiser_protocol_handler = {
 
 void wiser_costs_table_init();
 
-static std::unordered_map<uint64_t, int> path_costs;
-
 void wiser_protocol_init(void)
 {
   zlog_info("wiser_protocol_init: starting");
 
-  // read in path costs file
-  std::ifstream wiser_configuration("/etc/quagga/wiser.conf");
-  std::string line;
-  while (std::getline(wiser_configuration, line)) {
-      if (line.length() == 0) {
-	  continue;
-      }
-
-      if (line[0] == '#') {
-	  // comment
-	  continue;
-      }
-
-      std::istringstream iss(line);
-      std::string directive;
-      iss >> directive;
-
-      zlog_debug("Found directive: %s", directive.c_str());
-
-      if (directive == "path_cost") {
-	  uint32_t as1, as2, cost;
-	  iss >> as1 >> as2 >> cost;
-
-	  zlog_debug("path_cost %d %d %d", as1, as2, cost);
-
-	  uint64_t as_pair = (uint64_t) std::min(as1, as2) << 32 | std::max(as1, as2);
-	  path_costs.insert(std::make_pair(as_pair, cost));
-      } else {
-	  zlog_err("Unknown directive %s", directive.c_str());
-      }
-  }
+  // load static path costs from file
+  wiser_static_path_costs_init();
 
   // initialize wiser costs table (both send and recv)
   wiser_costs_table_init();
@@ -92,11 +59,6 @@ void wiser_costs_table_init()
 {
   advcost_sent.clear();
   advcost_recv.clear();
-}
-
-static int wiser_get_path_cost(int as1, int as2) {
-  uint64_t as_pair = (uint64_t) std::min(as1, as2) << 32 | std::max(as1, as2);
-  return path_costs[as_pair];
 }
 
 static void increment_map_value(std::unordered_map<as_t, uint32_t>& map, as_t key, uint32_t delta)
