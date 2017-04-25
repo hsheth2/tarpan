@@ -103,9 +103,9 @@ static void increment_map_value(std::unordered_map<as_t, uint32_t>& map, as_t ke
 {
   auto find = map.find(key);
 
-  if (find == map.end()) {
-      map[key] = delta;
-  } else
+  if (find == map.end())
+    map[key] = delta;
+  else
     find->second += delta;
 }
 
