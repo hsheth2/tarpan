@@ -2492,8 +2492,10 @@ bgp_packet_attribute (struct bgp *bgp, struct peer *peer,
       tarpan_wire = tarp;
 //      SET_FLAG(attr->flag, ATTR_FLAG_BIT (BGP_ATTR_TARPAN));
     }
-  else
+  else {
+    tarpan_update_packet(peer, attr->tarpan);
     tarpan_wire = attr->tarpan;
+  }
 
   // No matter what, there will be a tarpan to send.
   assert(tarpan_wire);

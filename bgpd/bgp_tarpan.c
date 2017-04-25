@@ -163,6 +163,13 @@ void tarpan_initialize_packet (struct peer *const peer, struct tarpan * tarp)
     tarpan_active_handler->initialize_packet(peer, tarp);
 }
 
+void tarpan_update_packet (struct peer *const peer, struct tarpan * tarp)
+{
+  // update protocol's information
+  if (tarpan_active_handler)
+    tarpan_active_handler->update_packet(peer, tarp);
+}
+
 struct tarpan *
 tarpan_parse (u_int8_t *pnt, u_short length)
 {
