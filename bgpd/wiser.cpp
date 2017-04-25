@@ -139,22 +139,24 @@ void wiser_packet_received_handler (struct peer *const peer,
     }
 
   Wiser* wiser = tarp->message->wiser;
-
   zlog_debug("wiser_packet_received_handler");
+
+  // update recv costs
+  update_recv_cost(wiser->sender_as, wiser->path_cost);
 
   // determine if the packet was sent via a gulf,
   // or if it was sent directly (within same island)
-  as_t my_as = peer->bgp->as;
-  as_t intended_as = wiser->sender_as;
+  if (peer->as == wiser->sender_as) { // not over a gulf
+      // nothing
+  } else { // over a gulf
+      // must update other AS's sent costs
+      // using the specified cost portal
 
-  if (my_as == intended_as) {
-      // not over a gulf
-  } else {
-      // over a gulf
       // TODO must contact cost portal
   }
 
-  // TODO update cost portal data
+  // apply normalization to incoming path costs
+  wiser->path_cost *= normalization(peer->as);
 }
 
 void wiser_initialize_packet (struct peer *const peer,
@@ -182,20 +184,30 @@ void wiser_initialize_packet (struct peer *const peer,
 void wiser_update_packet (struct peer *const peer,
 			  struct tarpan * tarpan)
 {
-  if (!tarpan->message->wiser) {
+  Wiser* wiser = tarpan->message->wiser;
+  if (!wiser) {
       wiser_initialize_packet(peer, tarpan);
       return;
   }
+  assert(wiser);
 
-  // TODO normalize previous path cost
-  uint32_t my_segment_cost = wiser_get_path_cost(peer->bgp->as, peer->as);
+  wiser->path_cost = wiser_get_path_cost(peer->bgp->as, peer->as);
+  update_sent_cost(peer->as, wiser->path_cost);
 
-  // TODO wiser_update_packet
+  zlog_debug("wiser_update_packet");
+
+  // place this node's AS/IP address in wiser data
+  IPAddress* local_addr = (IPAddress*) malloc(sizeof(IPAddress));
+  ipaddress__init(local_addr);
+  local_addr->bytes = peer->bgp->router_id.s_addr;
+
+  wiser->sender_as = peer->bgp->as;
+  wiser->sender_address = local_addr;
 }
 
 void wiser_best_selection (struct bgp *bgp, struct bgp_node *rn,
   		    struct bgp_maxpaths_cfg *mpath_cfg,
   		    struct bgp_info_pair *result)
 {
-  // TODO nothing here
+  // TODO nothing here yet
 }
