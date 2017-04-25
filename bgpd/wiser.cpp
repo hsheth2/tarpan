@@ -99,7 +99,7 @@ static int wiser_get_path_cost(int as1, int as2) {
   return path_costs[as_pair];
 }
 
-void increment_map_value(std::unordered_map<as_t, uint32_t>& map, as_t key, uint32_t delta)
+static void increment_map_value(std::unordered_map<as_t, uint32_t>& map, as_t key, uint32_t delta)
 {
   auto find = map.find(key);
 
@@ -109,15 +109,15 @@ void increment_map_value(std::unordered_map<as_t, uint32_t>& map, as_t key, uint
     find->second += delta;
 }
 
-void update_sent_cost(as_t destination, uint32_t cost) {
+static void update_sent_cost(as_t destination, uint32_t cost) {
   increment_map_value(advcost_sent, destination, cost);
 }
 
-void update_recv_cost(as_t from, uint32_t cost) {
+static void update_recv_cost(as_t from, uint32_t cost) {
   increment_map_value(advcost_recv, from, cost);
 }
 
-double normalization(as_t peer) {
+static double normalization(as_t peer) {
   // multiply the costs received from this peer by the normalization factor
 
   // TODO: come up with a better system for handling 0
