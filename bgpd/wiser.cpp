@@ -30,10 +30,10 @@ extern "C" {
 
 // C++14 does support designated initializers
 struct tarpan_protocol_handler wiser_protocol_handler = {
-    .bgp_best_selection = wiser_best_selection,
     .packet_received_handler = wiser_packet_received_handler,
     .initialize_packet = wiser_initialize_packet,
     .update_packet = wiser_update_packet,
+    .protocol_info_cmp = wiser_info_cmp,
 };
 
 void wiser_costs_table_init();
@@ -167,9 +167,10 @@ void wiser_update_packet (struct peer *const peer,
   wiser->sender_address = local_addr;
 }
 
-void wiser_best_selection (struct bgp *bgp, struct bgp_node *rn,
-  		    struct bgp_maxpaths_cfg *mpath_cfg,
-  		    struct bgp_info_pair *result)
+int wiser_info_cmp (struct bgp *bgp, struct bgp_info *nw,
+      struct bgp_info *exist, int *paths_eq)
 {
-  // TODO nothing here yet
+  // TODO: this function
+  zlog_debug("wiser_info_cmp");
+  return 0;
 }
