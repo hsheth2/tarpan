@@ -193,6 +193,8 @@ extern struct bgp_info_extra *bgp_info_extra_get (struct bgp_info *);
 extern void bgp_info_set_flag (struct bgp_node *, struct bgp_info *, u_int32_t);
 extern void bgp_info_unset_flag (struct bgp_node *, struct bgp_info *, u_int32_t);
 
+extern u_int32_t bgp_med_value (struct attr *attr, struct bgp *bgp);
+
 extern int bgp_nlri_sanity_check (struct peer *, int, u_char *, bgp_size_t);
 extern int bgp_nlri_parse (struct peer *, struct attr *, struct bgp_nlri *);
 

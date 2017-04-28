@@ -309,7 +309,7 @@ bgp_info_unset_flag (struct bgp_node *rn, struct bgp_info *ri, u_int32_t flag)
 
 /* Get MED value.  If MED value is missing and "bgp bestpath
    missing-as-worst" is specified, treat it as the worst value. */
-static u_int32_t
+u_int32_t
 bgp_med_value (struct attr *attr, struct bgp *bgp)
 {
   if (attr->flag & ATTR_FLAG_BIT (BGP_ATTR_MULTI_EXIT_DISC))
