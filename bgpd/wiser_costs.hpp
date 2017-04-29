@@ -131,7 +131,7 @@ cost_portal (int server_fd, struct sockaddr_in address)
       if (new_socket < 0)
 	break;
 
-      std::thread (cost_portal_handle_connection, new_socket);
+      std::thread (cost_portal_handle_connection, new_socket).detach();
     }
 
   close (server_fd);

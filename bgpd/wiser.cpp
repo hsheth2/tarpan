@@ -87,7 +87,7 @@ wiser_packet_received_handler (struct peer * const peer,
 
       // must contact cost portal - not blocking
       std::thread (wiser_contact_cost_portal, wiser, wiser->path_cost,
-		   peer->bgp);
+		   peer->bgp).detach();
     }
 
   // apply normalization to incoming path costs
