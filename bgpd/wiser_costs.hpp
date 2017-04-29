@@ -66,7 +66,7 @@ static void cost_portal_handle_connection(int socket)
       read(socket, &message_size, sizeof(uint32_t));
 
       if (message_size > 4000000) {
-	  printf("Message size too large: %d", message_size);
+	  zlog_warn("Message size too large: %d", message_size);
 	  break;
       }
 
@@ -80,14 +80,14 @@ static void cost_portal_handle_connection(int socket)
 
       if (msg->has_ping) {
 	  // TODO
-	  printf("Ping received");
+	  zlog_info("Ping received");
       }
       if (msg->wiser_back) {
 	  // TODO
-	  printf("wiser_back received %d", msg->wiser_back->test_value);
+	  zlog_info("wiser_back received %d", msg->wiser_back->test_value);
       }
       if (msg->has_close && msg->close) {
-	  printf("Closing connection");
+	  zlog_info("Closing connection");
 	  tarpan_backpropagation__free_unpacked(msg, NULL);
 	  break;
       }
