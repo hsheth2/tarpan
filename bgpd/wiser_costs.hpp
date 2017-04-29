@@ -73,7 +73,7 @@ cost_portal_handle_connection (int socket)
   // TODO: make more robust
   while (true)
     {
-      uint32_t message_size;
+      uint32_t message_size = 0;
       recv (socket, &message_size, sizeof(uint32_t), MSG_WAITALL);
 
       zlog_debug("Message size is %d", message_size);
