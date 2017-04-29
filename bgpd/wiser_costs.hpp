@@ -123,6 +123,8 @@ cost_portal (int server_fd, struct sockaddr_in address)
   int addrlen = sizeof(address);
   int new_socket;
 
+  zlog_debug("wiser: cost_portal open and listening for connections");
+
   while ((new_socket = accept (server_fd, (struct sockaddr *) &address,
 			       (socklen_t*) &addrlen)))
     {
@@ -160,6 +162,7 @@ wiser_cost_portal_init ()
   if (listen (server_fd, 3) < 0)
     return 1;
 
+  zlog_debug("wiser: starting cost_portal thread");
   wiser_cost_portal_thread = std::thread (cost_portal, server_fd, address);
   return 0;
 }
@@ -170,6 +173,8 @@ wiser_contact_cost_portal (Wiser* wiser, uint32_t cost, struct bgp * self)
   struct sockaddr_in address;
   int sock = 0, valread;
   struct sockaddr_in serv_addr;
+
+  zlog_debug("wiser: attempting to contact cost portal of as %d", wiser->sender_as);
 
   if ((sock = socket (AF_INET, SOCK_STREAM, 0)) < 0)
     return 1;
