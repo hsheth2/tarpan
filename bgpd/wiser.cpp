@@ -241,7 +241,11 @@ int wiser_info_cmp (struct bgp *bgp, struct bgp_info *nw,
   if (! (exist->sub_type == BGP_ROUTE_NORMAL))
     return 0;
 
-  // TODO: 3.5: Lowest Wiser cost
+  /* (3+i). Wiser cost check */
+  if (newattr->tarpan->message->wiser->path_cost > existattr->tarpan->message->wiser->path_cost)
+    return 1;
+  else
+    return 0;
 
   /* 4. AS path length check. */
   if (! bgp_flag_check (bgp, BGP_FLAG_ASPATH_IGNORE))
