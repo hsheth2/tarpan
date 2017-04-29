@@ -74,7 +74,7 @@ cost_portal_handle_connection (int socket)
   while (true)
     {
       uint32_t message_size;
-      read (socket, &message_size, sizeof(uint32_t));
+      recv (socket, &message_size, sizeof(uint32_t), MSG_WAITALL);
 
       zlog_debug("Message size is %d", message_size);
       if (message_size > 4000000)
@@ -84,7 +84,7 @@ cost_portal_handle_connection (int socket)
 	}
 
       uint8_t * buf = (uint8_t *) malloc (sizeof(uint8_t) * message_size);
-      read (socket, buf, message_size);
+      recv (socket, buf, message_size, MSG_WAITALL);
 
       TarpanBackpropagation * msg;
       msg = tarpan_backpropagation__unpack (NULL, message_size, buf);
@@ -200,8 +200,8 @@ wiser_contact_cost_portal (Wiser* wiser, uint32_t cost, struct bgp * self)
   uint32_t length = tarpan_backpropagation__get_packed_size (&tarp_back);
   uint8_t* buf = (uint8_t*) malloc (length);
   tarpan_backpropagation__pack (&tarp_back, buf);
-  send (sock, &length, sizeof(length), 0);
-  send (sock, buf, length, 0);
+  write (sock, &length, sizeof(length));
+  write (sock, buf, length);
   free (buf);
 
   close (sock);
