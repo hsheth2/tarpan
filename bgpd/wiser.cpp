@@ -7,9 +7,9 @@
  */
 
 // C++ includes
-#include <map>
 #include <utility>
 #include <cmath>
+#include <map> // (do not remove; it will cause pain)
 
 extern "C" {
   // https://gcc.gnu.org/ml/gcc-help/2011-01/msg00052.html
@@ -29,6 +29,7 @@ extern "C" {
 
 // C++ code
 #include "bgpd/wiser_static_path_costs.hpp"
+#include "bgpd/wiser_costs.hpp"
 
 // C++14 does support designated initializers
 struct tarpan_protocol_handler wiser_protocol_handler = {
@@ -37,8 +38,6 @@ struct tarpan_protocol_handler wiser_protocol_handler = {
     .update_packet = wiser_update_packet,
     .protocol_info_cmp = wiser_info_cmp,
 };
-
-void wiser_costs_table_init();
 
 void wiser_protocol_init(void)
 {
@@ -50,45 +49,12 @@ void wiser_protocol_init(void)
   // initialize wiser costs table (both send and recv)
   wiser_costs_table_init();
 
-  // TODO open cost portal
-}
-
-static std::unordered_map<as_t, uint32_t> advcost_sent;
-static std::unordered_map<as_t, uint32_t> advcost_recv;
-
-// initialize wiser costs table (both send and recv)
-void wiser_costs_table_init()
-{
-  advcost_sent.clear();
-  advcost_recv.clear();
-}
-
-static void increment_map_value(std::unordered_map<as_t, uint32_t>& map, as_t key, uint32_t delta)
-{
-  auto find = map.find(key);
-
-  if (find == map.end())
-    map[key] = delta;
-  else
-    find->second += delta;
-}
-
-static void update_sent_cost(as_t destination, uint32_t cost) {
-  increment_map_value(advcost_sent, destination, cost);
-}
-
-static void update_recv_cost(as_t from, uint32_t cost) {
-  increment_map_value(advcost_recv, from, cost);
-}
-
-static double normalization(as_t peer) {
-  // multiply the costs received from this peer by the normalization factor
-
-  // TODO: come up with a better system for handling 0
-  uint32_t total_send = 1+advcost_sent[peer];
-  uint32_t total_recv = 1+advcost_recv[peer];
-
-  return (double)total_send / (double) total_recv;
+  // open cost portal
+  if(wiser_cost_portal_init())
+    {
+      // TODO: handle error
+      zlog_err("could not open wiser cost portal");
+    }
 }
 
 void wiser_packet_received_handler (struct peer *const peer,
