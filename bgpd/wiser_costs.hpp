@@ -141,6 +141,29 @@ int wiser_cost_portal_init() {
   return 0;
 }
 
+int wiser_contact_cost_portal(Wiser* wiser)
+{
+  struct sockaddr_in address;
+  int sock = 0, valread;
+  struct sockaddr_in serv_addr;
+
+  if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+    return 1;
+
+  memset(&serv_addr, '0', sizeof(serv_addr));
+  serv_addr.sin_family = AF_INET;
+  serv_addr.sin_port = htons(wiser_cost_portal_port);
+  serv_addr.sin_addr = wiser->sender_address->bytes;
+
+  if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
+    return 1;
+
+  // TODO use this socket connection
+
+  close(sock);
+  return 0;
+}
+
 // multiply the costs received from this peer by the normalization factor
 static double normalization(as_t peer) {
   std::lock_guard<std::mutex> guard(cost_mutex);

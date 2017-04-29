@@ -82,7 +82,8 @@ void wiser_packet_received_handler (struct peer *const peer,
       // must update other AS's sent costs
       // using the specified cost portal
 
-      // TODO must contact cost portal
+      // must contact cost portal - not blocking
+      std::thread(wiser_contact_cost_portal, wiser);
   }
 
   // apply normalization to incoming path costs
