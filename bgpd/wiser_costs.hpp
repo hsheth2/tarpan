@@ -12,11 +12,14 @@
 #include <unordered_map>
 #include <mutex>
 #include <thread>
+#include <vector>
 #include <stdio.h>
 #include <sys/socket.h>
 #include <stdlib.h>
 #include <netinet/in.h>
 #include <string.h>
+
+#include "bgpd/tarpan_backpropagation.pb-c.h"
 
 static std::mutex cost_mutex;
 static std::thread wiser_cost_portal_thread;
@@ -57,13 +60,40 @@ static void update_recv_cost(as_t from, uint32_t cost) {
 
 static void cost_portal_handle_connection(int socket)
 {
-  int size;
-  uint8_t buffer[1024];
-  size = read( socket , buffer, 1024);
+  // TODO: make more robust
+  while (true) {
+      uint32_t message_size;
+      read( socket, &message_size, sizeof(uint32_t));
 
-  // TODO: interact with incoming data
-  printf("%s\n",buffer );
-  printf("Hello message read from socket\n");
+      if (message_size > 4000000) {
+	  printf("Message size too large: %d", message_size);
+	  break;
+      }
+
+      uint8_t * buf = new uint8_t[message_size];
+      read(socket, buf, message_size);
+
+      TarpanBackpropagation * msg;
+      msg = tarpan_backpropagation__unpack(NULL, message_size, buf);
+
+      free(buf);
+
+      if (msg->has_ping) {
+	  // TODO
+	  printf("Ping received");
+      }
+      if (msg->wiser_back) {
+	  // TODO
+	  printf("wiser_back received %d", msg->wiser_back->test_value);
+      }
+      if (msg->has_close && msg->close) {
+	  printf("Closing connection");
+	  tarpan_backpropagation__free_unpacked(msg, NULL);
+	  break;
+      }
+
+      tarpan_backpropagation__free_unpacked(msg, NULL);
+  }
 
   close(socket);
 }

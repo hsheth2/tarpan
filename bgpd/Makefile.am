@@ -12,11 +12,14 @@ noinst_LIBRARIES = libbgp.a
 sbin_PROGRAMS = bgpd tarpantest
 
 BUILT_SOURCES = \
-	attr_tarpan.pb-c.c attr_tarpan.pb-c.h
+	attr_tarpan.pb-c.c attr_tarpan.pb-c.h tarpan_backpropagation.pb-c.c tarpan_backpropagation.pb-c.h
 CLEANFILES = $(BUILT_SOURCES)
 
 attr_tarpan.pb-c.c attr_tarpan.pb-c.h: attr_tarpan.proto
 	@PROTOC_C@ --c_out=. attr_tarpan.proto
+	
+tarpan_backpropagation.pb-c.c tarpan_backpropagation.pb-c.h: tarpan_backpropagation.proto
+	@PROTOC_C@ --c_out=. tarpan_backpropagation.proto
 
 libbgp_a_SOURCES = \
 	bgpd.c bgp_fsm.c bgp_aspath.c bgp_community.c bgp_attr.c \
