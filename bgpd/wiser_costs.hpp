@@ -25,141 +25,161 @@ static std::mutex cost_mutex;
 static std::thread wiser_cost_portal_thread;
 static const int wiser_cost_portal_port = 2259;
 
-void wiser_costs_table_init();
-int wiser_cost_portal_init();
+void
+wiser_costs_table_init ();
+int
+wiser_cost_portal_init ();
 
 static std::unordered_map<as_t, uint32_t> advcost_sent;
 static std::unordered_map<as_t, uint32_t> advcost_recv;
 
 // initialize wiser costs table (both send and recv)
-void wiser_costs_table_init()
+void
+wiser_costs_table_init ()
 {
   // technically not needed
-  advcost_sent.clear();
-  advcost_recv.clear();
+  advcost_sent.clear ();
+  advcost_recv.clear ();
 }
 
-static void increment_map_value(std::unordered_map<as_t, uint32_t>& map, as_t key, uint32_t delta)
+static void
+increment_map_value (std::unordered_map<as_t, uint32_t>& map, as_t key,
+		     uint32_t delta)
 {
-  std::lock_guard<std::mutex> guard(cost_mutex);
+  std::lock_guard<std::mutex> guard (cost_mutex);
 
-  auto find = map.find(key);
-  if (find == map.end())
+  auto find = map.find (key);
+  if (find == map.end ())
     map[key] = delta;
   else
     find->second += delta;
 }
 
-static void update_sent_cost(as_t destination, uint32_t cost) {
-  increment_map_value(advcost_sent, destination, cost);
+static void
+update_sent_cost (as_t destination, uint32_t cost)
+{
+  increment_map_value (advcost_sent, destination, cost);
 }
 
-static void update_recv_cost(as_t from, uint32_t cost) {
-  increment_map_value(advcost_recv, from, cost);
+static void
+update_recv_cost (as_t from, uint32_t cost)
+{
+  increment_map_value (advcost_recv, from, cost);
 }
 
-static void cost_portal_handle_connection(int socket)
+static void
+cost_portal_handle_connection (int socket)
 {
   // TODO: make more robust
-  while (true) {
+  while (true)
+    {
       uint32_t message_size;
-      read(socket, &message_size, sizeof(uint32_t));
+      read (socket, &message_size, sizeof(uint32_t));
 
-      if (message_size > 4000000) {
-	  zlog_warn("Message size too large: %d", message_size);
+      if (message_size > 4000000)
+	{
+	  zlog_warn ("Message size too large: %d", message_size);
 	  break;
-      }
+	}
 
-      uint8_t * buf = (uint8_t *) malloc(sizeof(uint8_t) * message_size);
-      read(socket, buf, message_size);
+      uint8_t * buf = (uint8_t *) malloc (sizeof(uint8_t) * message_size);
+      read (socket, buf, message_size);
 
       TarpanBackpropagation * msg;
-      msg = tarpan_backpropagation__unpack(NULL, message_size, buf);
+      msg = tarpan_backpropagation__unpack (NULL, message_size, buf);
 
-      free(buf);
+      free (buf);
 
-      if (msg->has_ping) {
-	  zlog_info("Ping received");
+      if (msg->has_ping)
+	{
+	  zlog_info ("Ping received");
 	  // TODO reply with pong?
-      }
+	}
 
-      if (msg->wiser_back) {
-	  zlog_info("wiser_back received from as %d", msg->wiser_back->as);
+      if (msg->wiser_back)
+	{
+	  zlog_info ("wiser_back received from as %d", msg->wiser_back->as);
 
 	  // update local cost sent
-	  update_sent_cost(msg->wiser_back->as, msg->wiser_back->cost);
-      }
+	  update_sent_cost (msg->wiser_back->as, msg->wiser_back->cost);
+	}
 
-      if (msg->has_close && msg->close) {
-	  zlog_info("Closing connection");
-	  tarpan_backpropagation__free_unpacked(msg, NULL);
+      if (msg->has_close && msg->close)
+	{
+	  zlog_info ("Closing connection");
+	  tarpan_backpropagation__free_unpacked (msg, NULL);
 	  break;
-      }
+	}
 
-      tarpan_backpropagation__free_unpacked(msg, NULL);
-  }
+      tarpan_backpropagation__free_unpacked (msg, NULL);
+    }
 
-  close(socket);
+  close (socket);
 }
 
-static int cost_portal(int server_fd, struct sockaddr_in address)
+static int
+cost_portal (int server_fd, struct sockaddr_in address)
 {
   int addrlen = sizeof(address);
   int new_socket;
 
-  while ((new_socket = accept(server_fd, (struct sockaddr *)&address,
-			      (socklen_t*)&addrlen))) {
+  while ((new_socket = accept (server_fd, (struct sockaddr *) &address,
+			       (socklen_t*) &addrlen)))
+    {
       if (new_socket < 0)
 	break;
 
-      std::thread(cost_portal_handle_connection, new_socket);
-  }
+      std::thread (cost_portal_handle_connection, new_socket);
+    }
 
-  close(server_fd);
+  close (server_fd);
   return 0;
 }
 
-int wiser_cost_portal_init() {
+int
+wiser_cost_portal_init ()
+{
   int server_fd;
   struct sockaddr_in address;
   int opt = 1;
 
   // Creating socket file descriptor
-  if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
+  if ((server_fd = socket (AF_INET, SOCK_STREAM, 0)) == 0)
     return 1;
 
   // Forcefully attaching socket to port
-  if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)))
+  if (setsockopt (server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)))
     return 1;
   address.sin_family = AF_INET;
   address.sin_addr.s_addr = INADDR_ANY;
-  address.sin_port = htons( wiser_cost_portal_port );
+  address.sin_port = htons(wiser_cost_portal_port);
 
   // Forcefully attaching socket to the port
-  if (bind(server_fd, (struct sockaddr *)&address, sizeof(address))<0)
+  if (bind (server_fd, (struct sockaddr *) &address, sizeof(address)) < 0)
     return 1;
-  if (listen(server_fd, 3) < 0)
+  if (listen (server_fd, 3) < 0)
     return 1;
 
-  wiser_cost_portal_thread = std::thread(cost_portal, server_fd, address);
+  wiser_cost_portal_thread = std::thread (cost_portal, server_fd, address);
   return 0;
 }
 
-int wiser_contact_cost_portal(Wiser* wiser, uint32_t cost, struct bgp * self)
+int
+wiser_contact_cost_portal (Wiser* wiser, uint32_t cost, struct bgp * self)
 {
   struct sockaddr_in address;
   int sock = 0, valread;
   struct sockaddr_in serv_addr;
 
-  if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+  if ((sock = socket (AF_INET, SOCK_STREAM, 0)) < 0)
     return 1;
 
-  memset(&serv_addr, '0', sizeof(serv_addr));
+  memset (&serv_addr, '0', sizeof(serv_addr));
   serv_addr.sin_family = AF_INET;
   serv_addr.sin_port = htons(wiser_cost_portal_port);
   serv_addr.sin_addr.s_addr = wiser->sender_address->bytes;
 
-  if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
+  if (connect (sock, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
     return 1;
 
   // use this socket connection
@@ -171,27 +191,28 @@ int wiser_contact_cost_portal(Wiser* wiser, uint32_t cost, struct bgp * self)
   wback.cost = cost; // note: not using wiser->path_cost because it may have changed
 
   // send the packet
-  uint32_t length = tarpan_backpropagation__get_packed_size(&tarp_back);
-  uint8_t* buf = (uint8_t*) malloc(length);
-  tarpan_backpropagation__pack(&tarp_back, buf);
-  send(sock, &length, sizeof(length), 0);
-  send(sock, buf, length, 0);
-  free(buf);
+  uint32_t length = tarpan_backpropagation__get_packed_size (&tarp_back);
+  uint8_t* buf = (uint8_t*) malloc (length);
+  tarpan_backpropagation__pack (&tarp_back, buf);
+  send (sock, &length, sizeof(length), 0);
+  send (sock, buf, length, 0);
+  free (buf);
 
-  close(sock);
+  close (sock);
   return 0;
 }
 
 // multiply the costs received from this peer by the normalization factor
-static double normalization(as_t peer) {
-  std::lock_guard<std::mutex> guard(cost_mutex);
+static double
+normalization (as_t peer)
+{
+  std::lock_guard<std::mutex> guard (cost_mutex);
 
   // TODO: come up with a better system for handling 0
-  uint32_t total_send = 1+advcost_sent[peer];
-  uint32_t total_recv = 1+advcost_recv[peer];
+  uint32_t total_send = 1 + advcost_sent[peer];
+  uint32_t total_recv = 1 + advcost_recv[peer];
 
-  return (double)total_send / (double) total_recv;
+  return (double) total_send / (double) total_recv;
 }
-
 
 #endif /* BGPD_WISER_COSTS_HPP_ */

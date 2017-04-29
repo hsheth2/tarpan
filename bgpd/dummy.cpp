@@ -8,7 +8,9 @@
 #include <iostream>
 #include <map>
 
-void foo() {
+void
+foo ()
+{
   std::cout << "bar\n";
 }
 

@@ -1,4 +1,3 @@
-
 /*
  * wiser.cpp
  *
@@ -11,8 +10,9 @@
 #include <cmath>
 #include <map> // (do not remove; it will cause pain)
 
-extern "C" {
-  // https://gcc.gnu.org/ml/gcc-help/2011-01/msg00052.html
+extern "C"
+{
+// https://gcc.gnu.org/ml/gcc-help/2011-01/msg00052.html
 #define new avoid_cxx_new_keyword
 
 #include "log.h"
@@ -32,33 +32,33 @@ extern "C" {
 #include "bgpd/wiser_costs.hpp"
 
 // C++14 does support designated initializers
-struct tarpan_protocol_handler wiser_protocol_handler = {
-    .packet_received_handler = wiser_packet_received_handler,
-    .initialize_packet = wiser_initialize_packet,
-    .update_packet = wiser_update_packet,
-    .protocol_info_cmp = wiser_info_cmp,
-};
+struct tarpan_protocol_handler wiser_protocol_handler =
+  { .packet_received_handler = wiser_packet_received_handler,
+      .initialize_packet = wiser_initialize_packet, .update_packet =
+	  wiser_update_packet, .protocol_info_cmp = wiser_info_cmp, };
 
-void wiser_protocol_init(void)
+void
+wiser_protocol_init (void)
 {
-  zlog_info("wiser_protocol_init: starting");
+  zlog_info ("wiser_protocol_init: starting");
 
   // load static path costs from file
-  wiser_static_path_costs_init();
+  wiser_static_path_costs_init ();
 
   // initialize wiser costs table (both send and recv)
-  wiser_costs_table_init();
+  wiser_costs_table_init ();
 
   // open cost portal
-  if(wiser_cost_portal_init())
+  if (wiser_cost_portal_init ())
     {
       // TODO: handle error
-      zlog_err("could not open wiser cost portal");
+      zlog_err ("could not open wiser cost portal");
     }
 }
 
-void wiser_packet_received_handler (struct peer *const peer,
-				    struct attr *const attr)
+void
+wiser_packet_received_handler (struct peer * const peer,
+			       struct attr * const attr)
 {
   struct tarpan * tarp = attr->tarpan;
 
@@ -69,77 +69,83 @@ void wiser_packet_received_handler (struct peer *const peer,
     }
 
   Wiser* wiser = tarp->message->wiser;
-  zlog_debug("wiser_packet_received_handler");
+  zlog_debug ("wiser_packet_received_handler");
 
   // update recv costs
-  update_recv_cost(wiser->sender_as, wiser->path_cost);
+  update_recv_cost (wiser->sender_as, wiser->path_cost);
 
   // determine if the packet was sent via a gulf,
   // or if it was sent directly (within same island)
-  if (peer->as == wiser->sender_as) { // not over a gulf
+  if (peer->as == wiser->sender_as)
+    { // not over a gulf
       // nothing
-  } else { // over a gulf
+    }
+  else
+    { // over a gulf
       // must update other AS's sent costs
       // using the specified cost portal
 
       // must contact cost portal - not blocking
-      std::thread(wiser_contact_cost_portal, wiser, wiser->path_cost, peer->bgp);
-  }
+      std::thread (wiser_contact_cost_portal, wiser, wiser->path_cost,
+		   peer->bgp);
+    }
 
   // apply normalization to incoming path costs
-  wiser->path_cost *= normalization(peer->as);
+  wiser->path_cost *= normalization (peer->as);
 }
 
-void wiser_initialize_packet (struct peer *const peer,
-			      struct tarpan * tarpan)
+void
+wiser_initialize_packet (struct peer * const peer, struct tarpan * tarpan)
 {
-  Wiser* wiser = (Wiser*) malloc(sizeof(Wiser));
-  wiser__init(wiser);
+  Wiser* wiser = (Wiser*) malloc (sizeof(Wiser));
+  wiser__init (wiser);
   tarpan->message->wiser = wiser;
 
-  wiser->path_cost = wiser_get_path_cost(peer->bgp->as, peer->as);
+  wiser->path_cost = wiser_get_path_cost (peer->bgp->as, peer->as);
 
-  update_sent_cost(peer->as, wiser->path_cost);
+  update_sent_cost (peer->as, wiser->path_cost);
 
-  zlog_debug("wiser_initialize_packet");
+  zlog_debug ("wiser_initialize_packet");
 
   // place this node's AS/IP address in wiser data
-  IPAddress* local_addr = (IPAddress*) malloc(sizeof(IPAddress));
-  ipaddress__init(local_addr);
+  IPAddress* local_addr = (IPAddress*) malloc (sizeof(IPAddress));
+  ipaddress__init (local_addr);
   local_addr->bytes = peer->bgp->router_id.s_addr;
 
   wiser->sender_as = peer->bgp->as;
   wiser->sender_address = local_addr;
 }
 
-void wiser_update_packet (struct peer *const peer,
-			  struct tarpan * tarpan)
+void
+wiser_update_packet (struct peer * const peer, struct tarpan * tarpan)
 {
   Wiser* wiser = tarpan->message->wiser;
-  if (!wiser) {
-      wiser_initialize_packet(peer, tarpan);
+  if (!wiser)
+    {
+      wiser_initialize_packet (peer, tarpan);
       return;
-  }
+    }
   assert(wiser);
 
-  wiser->path_cost = wiser_get_path_cost(peer->bgp->as, peer->as);
-  update_sent_cost(peer->as, wiser->path_cost);
+  wiser->path_cost = wiser_get_path_cost (peer->bgp->as, peer->as);
+  update_sent_cost (peer->as, wiser->path_cost);
 
-  zlog_debug("wiser_update_packet");
+  zlog_debug ("wiser_update_packet");
 
   // place this node's AS/IP address in wiser data
-  IPAddress* local_addr = (IPAddress*) malloc(sizeof(IPAddress));
-  ipaddress__init(local_addr);
+  IPAddress* local_addr = (IPAddress*) malloc (sizeof(IPAddress));
+  ipaddress__init (local_addr);
   local_addr->bytes = peer->bgp->router_id.s_addr;
 
   wiser->sender_as = peer->bgp->as;
   wiser->sender_address = local_addr;
 }
 
-int wiser_info_cmp (struct bgp *bgp, struct bgp_info *nw,
-		    struct bgp_info *exist, int *paths_eq)
+int
+wiser_info_cmp (struct bgp *bgp, struct bgp_info *nw, struct bgp_info *exist,
+		int *paths_eq)
 {
-  zlog_debug("wiser_info_cmp");
+  zlog_debug ("wiser_info_cmp");
   struct attr *newattr, *existattr;
   struct attr_extra *newattre, *existattre;
   bgp_peer_sort_t new_sort;
@@ -188,9 +194,9 @@ int wiser_info_cmp (struct bgp *bgp, struct bgp_info *nw,
   /* 2. Local preference check. */
   new_pref = exist_pref = bgp->default_local_pref;
 
-  if (newattr->flag & ATTR_FLAG_BIT (BGP_ATTR_LOCAL_PREF))
+  if (newattr->flag & ATTR_FLAG_BIT(BGP_ATTR_LOCAL_PREF))
     new_pref = newattr->local_pref;
-  if (existattr->flag & ATTR_FLAG_BIT (BGP_ATTR_LOCAL_PREF))
+  if (existattr->flag & ATTR_FLAG_BIT(BGP_ATTR_LOCAL_PREF))
     exist_pref = existattr->local_pref;
 
   if (new_pref > exist_pref)
@@ -203,19 +209,20 @@ int wiser_info_cmp (struct bgp *bgp, struct bgp_info *nw,
    *  - BGP_ROUTE_AGGREGATE
    *  - BGP_ROUTE_REDISTRIBUTE
    */
-  if (! (nw->sub_type == BGP_ROUTE_NORMAL))
+  if (!(nw->sub_type == BGP_ROUTE_NORMAL))
     return 1;
-  if (! (exist->sub_type == BGP_ROUTE_NORMAL))
+  if (!(exist->sub_type == BGP_ROUTE_NORMAL))
     return 0;
 
   /* (3+i). Wiser cost check */
-  if (newattr->tarpan->message->wiser->path_cost > existattr->tarpan->message->wiser->path_cost)
+  if (newattr->tarpan->message->wiser->path_cost
+      > existattr->tarpan->message->wiser->path_cost)
     return 1;
   else
     return 0;
 
   /* 4. AS path length check. */
-  if (! bgp_flag_check (bgp, BGP_FLAG_ASPATH_IGNORE))
+  if (!bgp_flag_check (bgp, BGP_FLAG_ASPATH_IGNORE))
     {
       int exist_hops = aspath_count_hops (existattr->aspath);
       int exist_confeds = aspath_count_confeds (existattr->aspath);
@@ -227,9 +234,9 @@ int wiser_info_cmp (struct bgp *bgp, struct bgp_info *nw,
 	  aspath_hops = aspath_count_hops (newattr->aspath);
 	  aspath_hops += aspath_count_confeds (newattr->aspath);
 
-	  if ( aspath_hops < (exist_hops + exist_confeds))
+	  if (aspath_hops < (exist_hops + exist_confeds))
 	    return 1;
-	  if ( aspath_hops > (exist_hops + exist_confeds))
+	  if (aspath_hops > (exist_hops + exist_confeds))
 	    return 0;
 	}
       else
@@ -258,11 +265,10 @@ int wiser_info_cmp (struct bgp *bgp, struct bgp_info *nw,
       && aspath_count_hops (existattr->aspath) == 0);
 
   if (bgp_flag_check (bgp, BGP_FLAG_ALWAYS_COMPARE_MED)
-      || (bgp_flag_check (bgp, BGP_FLAG_MED_CONFED)
-	  && confed_as_route)
-	  || aspath_cmp_left (newattr->aspath, existattr->aspath)
-	  || aspath_cmp_left_confed (newattr->aspath, existattr->aspath)
-	  || internal_as_route)
+      || (bgp_flag_check (bgp, BGP_FLAG_MED_CONFED) && confed_as_route)
+      || aspath_cmp_left (newattr->aspath, existattr->aspath)
+      || aspath_cmp_left_confed (newattr->aspath, existattr->aspath)
+      || internal_as_route)
     {
       new_med = bgp_med_value (nw->attr, bgp);
       exist_med = bgp_med_value (exist->attr, bgp);
@@ -300,7 +306,7 @@ int wiser_info_cmp (struct bgp *bgp, struct bgp_info *nw,
   /* 9. Maximum path check. */
   if (newm == existm)
     {
-      if (bgp_flag_check(bgp, BGP_FLAG_ASPATH_MULTIPATH_RELAX))
+      if (bgp_flag_check (bgp, BGP_FLAG_ASPATH_MULTIPATH_RELAX))
 	{
 
 	  /*
@@ -331,16 +337,15 @@ int wiser_info_cmp (struct bgp *bgp, struct bgp_info *nw,
     }
 
   /* 10. If both paths are external, prefer the path that was received
-     first (the oldest one).  This step minimizes route-flap, since a
-     newer path won't displace an older one, even if it was the
-     preferred route based on the additional decision criteria below.  */
-  if (! bgp_flag_check (bgp, BGP_FLAG_COMPARE_ROUTER_ID)
-      && new_sort == BGP_PEER_EBGP
-      && exist_sort == BGP_PEER_EBGP)
+   first (the oldest one).  This step minimizes route-flap, since a
+   newer path won't displace an older one, even if it was the
+   preferred route based on the additional decision criteria below.  */
+  if (!bgp_flag_check (bgp, BGP_FLAG_COMPARE_ROUTER_ID)
+      && new_sort == BGP_PEER_EBGP && exist_sort == BGP_PEER_EBGP)
     {
-      if (CHECK_FLAG (nw->flags, BGP_INFO_SELECTED))
+      if (CHECK_FLAG(nw->flags, BGP_INFO_SELECTED))
 	return 1;
-      if (CHECK_FLAG (exist->flags, BGP_INFO_SELECTED))
+      if (CHECK_FLAG(exist->flags, BGP_INFO_SELECTED))
 	return 0;
     }
 
@@ -354,9 +359,9 @@ int wiser_info_cmp (struct bgp *bgp, struct bgp_info *nw,
   else
     exist_id.s_addr = exist->peer->remote_id.s_addr;
 
-  if (ntohl (new_id.s_addr) < ntohl (exist_id.s_addr))
+  if (ntohl (new_id.s_addr) < ntohl(exist_id.s_addr))
     return 1;
-  if (ntohl (new_id.s_addr) > ntohl (exist_id.s_addr))
+  if (ntohl (new_id.s_addr) > ntohl(exist_id.s_addr))
     return 0;
 
   /* 12. Cluster length comparision. */

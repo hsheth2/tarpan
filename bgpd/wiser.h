@@ -11,27 +11,31 @@
 // note: no CXX allowed in this file
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #include "bgpd/common.h"
 #include "bgpd/bgp_tarpan.h"
 
-extern struct tarpan_protocol_handler wiser_protocol_handler;
+  extern struct tarpan_protocol_handler wiser_protocol_handler;
 
-void wiser_protocol_init(void);
+  void
+  wiser_protocol_init (void);
 
-void wiser_packet_received_handler (struct peer *const peer,
-				    struct attr *const attr);
+  void
+  wiser_packet_received_handler (struct peer * const peer,
+				 struct attr * const attr);
 
-void wiser_initialize_packet (struct peer *const peer,
-			      struct tarpan * tarpan);
+  void
+  wiser_initialize_packet (struct peer * const peer, struct tarpan * tarpan);
 
-void wiser_update_packet (struct peer *const peer,
-			  struct tarpan * tarpan);
+  void
+  wiser_update_packet (struct peer * const peer, struct tarpan * tarpan);
 
-int wiser_info_cmp (struct bgp *bgp, struct bgp_info *nw,
-      struct bgp_info *exist, int *paths_eq);
+  int
+  wiser_info_cmp (struct bgp *bgp, struct bgp_info *nw, struct bgp_info *exist,
+		  int *paths_eq);
 
 #ifdef __cplusplus
 }
