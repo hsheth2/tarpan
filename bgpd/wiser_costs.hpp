@@ -63,7 +63,7 @@ static void cost_portal_handle_connection(int socket)
   // TODO: make more robust
   while (true) {
       uint32_t message_size;
-      read( socket, &message_size, sizeof(uint32_t));
+      read(socket, &message_size, sizeof(uint32_t));
 
       if (message_size > 4000000) {
 	  printf("Message size too large: %d", message_size);
