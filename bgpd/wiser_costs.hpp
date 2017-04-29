@@ -89,8 +89,6 @@ cost_portal_handle_connection (int socket)
       TarpanBackpropagation * msg;
       msg = tarpan_backpropagation__unpack (NULL, message_size, buf);
 
-      free (buf);
-
       if (msg->has_ping)
 	{
 	  zlog_info ("Ping received");
@@ -113,6 +111,7 @@ cost_portal_handle_connection (int socket)
 	}
 
       tarpan_backpropagation__free_unpacked (msg, NULL);
+      free (buf);
     }
 
   close (socket);
