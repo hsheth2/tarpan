@@ -76,6 +76,7 @@ cost_portal_handle_connection (int socket)
       uint32_t message_size;
       read (socket, &message_size, sizeof(uint32_t));
 
+      zlog_debug("Message size is %d", message_size);
       if (message_size > 4000000)
 	{
 	  zlog_warn ("Message size too large: %d", message_size);
