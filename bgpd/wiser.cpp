@@ -12,7 +12,7 @@
 #include <cmath>
 
 extern "C" {
-// https://gcc.gnu.org/ml/gcc-help/2011-01/msg00052.html
+  // https://gcc.gnu.org/ml/gcc-help/2011-01/msg00052.html
 #define new avoid_cxx_new_keyword
 
 #include "log.h"
@@ -92,7 +92,7 @@ static double normalization(as_t peer) {
 }
 
 void wiser_packet_received_handler (struct peer *const peer,
-                    struct attr *const attr)
+				    struct attr *const attr)
 {
   struct tarpan * tarp = attr->tarpan;
 
@@ -170,7 +170,7 @@ void wiser_update_packet (struct peer *const peer,
 }
 
 int wiser_info_cmp (struct bgp *bgp, struct bgp_info *nw,
-      struct bgp_info *exist, int *paths_eq)
+		    struct bgp_info *exist, int *paths_eq)
 {
   zlog_debug("wiser_info_cmp");
   struct attr *newattr, *existattr;
@@ -237,9 +237,9 @@ int wiser_info_cmp (struct bgp *bgp, struct bgp_info *nw,
    *  - BGP_ROUTE_REDISTRIBUTE
    */
   if (! (nw->sub_type == BGP_ROUTE_NORMAL))
-     return 1;
+    return 1;
   if (! (exist->sub_type == BGP_ROUTE_NORMAL))
-     return 0;
+    return 0;
 
   // TODO: 3.5: Lowest Wiser cost
 
@@ -250,26 +250,26 @@ int wiser_info_cmp (struct bgp *bgp, struct bgp_info *nw,
       int exist_confeds = aspath_count_confeds (existattr->aspath);
 
       if (bgp_flag_check (bgp, BGP_FLAG_ASPATH_CONFED))
-  {
-    int aspath_hops;
+	{
+	  int aspath_hops;
 
-    aspath_hops = aspath_count_hops (newattr->aspath);
-          aspath_hops += aspath_count_confeds (newattr->aspath);
+	  aspath_hops = aspath_count_hops (newattr->aspath);
+	  aspath_hops += aspath_count_confeds (newattr->aspath);
 
-    if ( aspath_hops < (exist_hops + exist_confeds))
-      return 1;
-    if ( aspath_hops > (exist_hops + exist_confeds))
-      return 0;
-  }
+	  if ( aspath_hops < (exist_hops + exist_confeds))
+	    return 1;
+	  if ( aspath_hops > (exist_hops + exist_confeds))
+	    return 0;
+	}
       else
-  {
-    int newhops = aspath_count_hops (newattr->aspath);
+	{
+	  int newhops = aspath_count_hops (newattr->aspath);
 
-    if (newhops < exist_hops)
-      return 1;
-          if (newhops > exist_hops)
-      return 0;
-  }
+	  if (newhops < exist_hops)
+	    return 1;
+	  if (newhops > exist_hops)
+	    return 0;
+	}
     }
 
   /* 5. Origin check. */
@@ -280,26 +280,26 @@ int wiser_info_cmp (struct bgp *bgp, struct bgp_info *nw,
 
   /* 6. MED check. */
   internal_as_route = (aspath_count_hops (newattr->aspath) == 0
-          && aspath_count_hops (existattr->aspath) == 0);
+      && aspath_count_hops (existattr->aspath) == 0);
   confed_as_route = (aspath_count_confeds (newattr->aspath) > 0
-        && aspath_count_confeds (existattr->aspath) > 0
-        && aspath_count_hops (newattr->aspath) == 0
-        && aspath_count_hops (existattr->aspath) == 0);
+      && aspath_count_confeds (existattr->aspath) > 0
+      && aspath_count_hops (newattr->aspath) == 0
+      && aspath_count_hops (existattr->aspath) == 0);
 
   if (bgp_flag_check (bgp, BGP_FLAG_ALWAYS_COMPARE_MED)
       || (bgp_flag_check (bgp, BGP_FLAG_MED_CONFED)
-   && confed_as_route)
-      || aspath_cmp_left (newattr->aspath, existattr->aspath)
-      || aspath_cmp_left_confed (newattr->aspath, existattr->aspath)
-      || internal_as_route)
+	  && confed_as_route)
+	  || aspath_cmp_left (newattr->aspath, existattr->aspath)
+	  || aspath_cmp_left_confed (newattr->aspath, existattr->aspath)
+	  || internal_as_route)
     {
       new_med = bgp_med_value (nw->attr, bgp);
       exist_med = bgp_med_value (exist->attr, bgp);
 
       if (new_med < exist_med)
-  return 1;
+	return 1;
       if (new_med > exist_med)
-  return 0;
+	return 0;
     }
 
   /* 7. Peer type check. */
@@ -330,25 +330,25 @@ int wiser_info_cmp (struct bgp *bgp, struct bgp_info *nw,
   if (newm == existm)
     {
       if (bgp_flag_check(bgp, BGP_FLAG_ASPATH_MULTIPATH_RELAX))
-        {
+	{
 
-    /*
-     * For the two paths, all comparison steps till IGP metric
-     * have succeeded - including AS_PATH hop count. Since 'bgp
-     * bestpath as-path multipath-relax' knob is on, we don't need
-     * an exact match of AS_PATH. Thus, mark the paths are equal.
-     * That will trigger both these paths to get into the multipath
-     * array.
-     */
-    *paths_eq = 1;
-        }
+	  /*
+	   * For the two paths, all comparison steps till IGP metric
+	   * have succeeded - including AS_PATH hop count. Since 'bgp
+	   * bestpath as-path multipath-relax' knob is on, we don't need
+	   * an exact match of AS_PATH. Thus, mark the paths are equal.
+	   * That will trigger both these paths to get into the multipath
+	   * array.
+	   */
+	  *paths_eq = 1;
+	}
       else if (nw->peer->sort == BGP_PEER_IBGP)
-  {
-    if (aspath_cmp (nw->attr->aspath, exist->attr->aspath))
-      *paths_eq = 1;
-  }
+	{
+	  if (aspath_cmp (nw->attr->aspath, exist->attr->aspath))
+	    *paths_eq = 1;
+	}
       else if (nw->peer->as == exist->peer->as)
-  *paths_eq = 1;
+	*paths_eq = 1;
     }
   else
     {
@@ -368,9 +368,9 @@ int wiser_info_cmp (struct bgp *bgp, struct bgp_info *nw,
       && exist_sort == BGP_PEER_EBGP)
     {
       if (CHECK_FLAG (nw->flags, BGP_INFO_SELECTED))
-  return 1;
+	return 1;
       if (CHECK_FLAG (exist->flags, BGP_INFO_SELECTED))
-  return 0;
+	return 0;
     }
 
   /* 11. Rourter-ID comparision. */
