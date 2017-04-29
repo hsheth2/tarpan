@@ -70,7 +70,7 @@ static void cost_portal_handle_connection(int socket)
 	  break;
       }
 
-      uint8_t * buf = new uint8_t[message_size];
+      uint8_t * buf = (uint8_t *) malloc(sizeof(uint8_t) * message_size);
       read(socket, buf, message_size);
 
       TarpanBackpropagation * msg;
