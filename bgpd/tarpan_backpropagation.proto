@@ -1,8 +1,8 @@
 syntax = "proto2";
 
 message WiserBack {
-	optional int32 test_value = 1;
-	// ...
+	required uint32 as = 1;
+	required uint32 cost = 2;
 }
 
 message TarpanBackpropagation {

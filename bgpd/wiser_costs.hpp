@@ -79,13 +79,17 @@ static void cost_portal_handle_connection(int socket)
       free(buf);
 
       if (msg->has_ping) {
-	  // TODO
 	  zlog_info("Ping received");
+	  // TODO reply with pong?
       }
+
       if (msg->wiser_back) {
-	  // TODO
-	  zlog_info("wiser_back received %d", msg->wiser_back->test_value);
+	  zlog_info("wiser_back received from as %d", msg->wiser_back->as);
+
+	  // update local cost sent
+	  update_sent_cost(msg->wiser_back->as, msg->wiser_back->cost);
       }
+
       if (msg->has_close && msg->close) {
 	  zlog_info("Closing connection");
 	  tarpan_backpropagation__free_unpacked(msg, NULL);
@@ -141,7 +145,7 @@ int wiser_cost_portal_init() {
   return 0;
 }
 
-int wiser_contact_cost_portal(Wiser* wiser)
+int wiser_contact_cost_portal(Wiser* wiser, uint32_t cost, struct bgp * self)
 {
   struct sockaddr_in address;
   int sock = 0, valread;
@@ -153,12 +157,26 @@ int wiser_contact_cost_portal(Wiser* wiser)
   memset(&serv_addr, '0', sizeof(serv_addr));
   serv_addr.sin_family = AF_INET;
   serv_addr.sin_port = htons(wiser_cost_portal_port);
-  serv_addr.sin_addr = wiser->sender_address->bytes;
+  serv_addr.sin_addr.s_addr = wiser->sender_address->bytes;
 
   if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
     return 1;
 
-  // TODO use this socket connection
+  // use this socket connection
+  TarpanBackpropagation tarp_back = TARPAN_BACKPROPAGATION__INIT;
+  WiserBack wback = WISER_BACK__INIT;
+  tarp_back.wiser_back = &wback;
+
+  wback.as = self->as;
+  wback.cost = cost; // note: not using wiser->path_cost because it may have changed
+
+  // send the packet
+  uint32_t length = tarpan_backpropagation__get_packed_size(&tarp_back);
+  uint8_t* buf = (uint8_t*) malloc(length);
+  tarpan_backpropagation__pack(&tarp_back, buf);
+  send(sock, &length, sizeof(length), 0);
+  send(sock, buf, length, 0);
+  free(buf);
 
   close(sock);
   return 0;
