@@ -10,7 +10,7 @@ cd $HOME/protobuf-build
 
 # install protobuf
 if [ ! -d "protobuf-$PROTOBUF_VERSION" ]; then
-	wget https://github.com/google/protobuf/releases/download/v$PROTOBUF_VERSION/protobuf-$PROTOBUF_VERSION.tar.gz
+	wget -nv https://github.com/google/protobuf/releases/download/v$PROTOBUF_VERSION/protobuf-$PROTOBUF_VERSION.tar.gz
 	tar xf protobuf-$PROTOBUF_VERSION.tar.gz
 	( cd protobuf-$PROTOBUF_VERSION && ./configure --prefix=$HOME/protobuf-$PROTOBUF_VERSION-bin && make -j2 )
 fi

@@ -15,7 +15,7 @@ Makefile
 libtool
 config.status
 
-# Created by https://www.gitignore.io/api/eclipse,windows,macos,linux,autotools,c
+# Created by https://www.gitignore.io/api/eclipse,windows,macos,linux,autotools,c,vagrant
 
 ### C ###
 # Prerequisites
@@ -221,6 +221,9 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+### Vagrant ###
+.vagrant/
 
 # End of https://www.gitignore.io/api/eclipse,windows,macos,linux,autotools
 config.log
