@@ -18,6 +18,8 @@ along with GNU Zebra; see the file COPYING.  If not, write to the Free
 Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.  */
 
+#include <time.h>
+
 #include <zebra.h>
 
 #include "thread.h"
@@ -1600,6 +1602,9 @@ bgp_open_receive (struct peer *peer, bgp_size_t size)
   return 0;
 }
 
+int advertisements_received = 0;
+#define PERFORMANCE_BENCHMARK_STOP_COUNTING_AT 100000
+struct timespec timer_start;
 /* Parse BGP Update packet and make attribute object. */
 //P BGP packet receive routine + parsing
 static int
@@ -1617,6 +1622,15 @@ bgp_update_receive (struct peer *peer, bgp_size_t size)
   struct bgp_nlri withdraw;
   struct bgp_nlri mp_update;
   struct bgp_nlri mp_withdraw;
+
+  if (peer->as >= 1337)
+    {
+      if (advertisements_received == 0)
+	{
+	  clock_gettime(CLOCK_MONOTONIC, &timer_start);
+	}
+      advertisements_received++;
+    }
 
   /* Status must be Established. */
   if (peer->status != Established) 
@@ -1954,6 +1968,16 @@ bgp_update_receive (struct peer *peer, bgp_size_t size)
   /* Rearm holdtime timer */
   BGP_TIMER_OFF (peer->t_holdtime);
   bgp_timer_set (peer);
+
+
+  if (advertisements_received == PERFORMANCE_BENCHMARK_STOP_COUNTING_AT)
+    {
+      advertisements_received = 0;
+      struct timespec end_time;
+      clock_gettime(CLOCK_MONOTONIC, &end_time);
+#define PERFORMANCE_BENCHMARK_TS_TO_SEC(ts) ((double)(ts).tv_sec + (double)(ts).tv_nsec / 1000000000.0)
+      zlog_info("it took %f", PERFORMANCE_BENCHMARK_TS_TO_SEC(end_time) - PERFORMANCE_BENCHMARK_TS_TO_SEC(timer_start));
+    }
 
   return 0;
 }
