@@ -70,11 +70,15 @@ update_recv_cost (as_t from, uint32_t cost)
 static void
 cost_portal_handle_connection (int socket)
 {
+  int bytes_read;
+
   // TODO: make more robust
   while (true)
     {
       uint32_t message_size = 0;
-      recv (socket, &message_size, sizeof(uint32_t), MSG_WAITALL);
+      bytes_read = recv (socket, &message_size, sizeof(uint32_t), MSG_WAITALL);
+      if (bytes_read == 0)
+	break;
 
       zlog_debug("Message size is %d", message_size);
       if (message_size > 4000000)
@@ -84,7 +88,9 @@ cost_portal_handle_connection (int socket)
 	}
 
       uint8_t * buf = (uint8_t *) malloc (sizeof(uint8_t) * message_size);
-      recv (socket, buf, message_size, MSG_WAITALL);
+      bytes_read = recv (socket, buf, message_size, MSG_WAITALL);
+      if (bytes_read != message_size)
+	break;
 
       TarpanBackpropagation * msg;
       msg = tarpan_backpropagation__unpack (NULL, message_size, buf);
