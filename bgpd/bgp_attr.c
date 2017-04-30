@@ -1722,6 +1722,11 @@ bgp_tarpan_parse (struct bgp_attr_parser_args *args)
 
   attr->flag |= ATTR_FLAG_BIT (BGP_ATTR_TARPAN);
 
+  if (tarpan_active_handler) {
+    zlog_info("Calling tarpan api packet_received_handler");
+    tarpan_active_handler->packet_received_handler(peer, attr);
+  }
+
   return BGP_ATTR_PARSE_PROCEED;
 }
 
@@ -2481,15 +2486,16 @@ bgp_packet_attribute (struct bgp *bgp, struct peer *peer,
       // create a new tarpan attribute
       zlog_info("Creating a new tarpan!");
 
-      struct tarpan * tarp = tarpan_new_default();
-//      tarp = tarpan_intern(tarp);
+      struct tarpan * tarp = tarpan_new();
+      tarpan_initialize_packet(peer, tarp);
 
-//      attr->tarpan = tarp;
       tarpan_wire = tarp;
 //      SET_FLAG(attr->flag, ATTR_FLAG_BIT (BGP_ATTR_TARPAN));
     }
-  else
+  else {
+    tarpan_update_packet(peer, attr->tarpan);
     tarpan_wire = attr->tarpan;
+  }
 
   // No matter what, there will be a tarpan to send.
   assert(tarpan_wire);

@@ -68,9 +68,13 @@ dnl Check CC and friends
 dnl --------------------
 AC_LANG([C])
 AC_PROG_CC
+AC_PROG_CXX
 AC_PROG_CPP
+AC_REQUIRE_CPP
 AM_PROG_CC_C_O
 AC_PROG_EGREP
+AX_CXX_COMPILE_STDCXX_14
+CXXFLAGS="-fpic -shared -std=c++14 ${CXXFLAGS}"
 
 dnl autoconf 2.59 appears not to support AC_PROG_SED
 dnl AC_PROG_SED
@@ -136,6 +140,7 @@ if test "x${cflags_specified}" = "x" ; then
         AC_MSG_RESULT([Intel default])
         ;;
     "GCC")
+  	dnl CFLAGS="-Os -fno-omit-frame-pointer -g -std=gnu99 -Wall"
   	CFLAGS="-Os -fno-omit-frame-pointer -g -std=gnu99 -Wall"
   	CFLAGS="${CFLAGS} -Wsign-compare -Wpointer-arith"
   	CFLAGS="${CFLAGS} -Wbad-function-cast -Wwrite-strings"
@@ -776,7 +781,7 @@ AC_CHECK_FUNCS([dup2 ftruncate getcwd gethostbyname getpagesize gettimeofday \
 	if_nametoindex if_indextoname getifaddrs \
 	uname fcntl])
 
-AC_CHECK_FUNCS(setproctitle, ,
+AC_CHECK_FUNCS(setproctitle,,
   [AC_CHECK_LIB(util, setproctitle, 
      [LIBS="$LIBS -lutil"
       AC_DEFINE(HAVE_SETPROCTITLE,, Have setproctitle)
@@ -1099,6 +1104,26 @@ if test -z "$PROTOC_C"; then
   AC_MSG_ERROR([Please install the protobuf-c compiler from https://github.com/protobuf-c/protobuf-c/.])
 fi
 
+dnl -------------------------------
+dnl Protocol buffers
+dnl ------------------------------
+dnl PKG_CHECK_MODULES([PROTOBUF], [protobuf >= 2.4.0])
+dnl AC_SUBST(PROTOBUF_LIBS)
+dnl AC_SUBST(PROTOBUF_CFLAGS)
+dnl AC_SUBST(PROTOBUF_VERSION)
+dnl AC_CHECK_PROG([PROTOC], [protoc], [protoc])
+dnl AS_IF([test "x${PROTOC}" == "x"],
+dnl     [AC_MSG_ERROR([ProtoBuf compiler "protoc" not found.])])
+
+dnl ----------
+dnl CPP
+dnl ----------
+dnl AX_CXX_COMPILE_STDCXX_11 #([mandatory])
+AC_CHECK_LIB([stdc++], [__cxa_demangle], [
+AC_DEFINE([HAVE_LIBSTDC__], [1], [we have libstdc++])
+  libstdcxx_LIBS="-lstdc++"], [
+  libstdcxx_LIBS=""])
+AC_SUBST(libstdcxx_LIBS)
 
 dnl --------------------
 dnl Daemon disable check
@@ -1595,6 +1620,8 @@ host operating system   : ${host_os}
 source code location    : ${srcdir}
 compiler                : ${CC}
 compiler flags          : ${CFLAGS}
+c++ compiler            : ${CXX}
+c++ compiler flags      : ${CXXFLAGS}
 make                    : ${MAKE-make}
 linker flags            : ${LDFLAGS} ${LIBS} ${LIBCAP} ${LIBREADLINE} ${LIBM}
 state file directory    : ${quagga_statedir}

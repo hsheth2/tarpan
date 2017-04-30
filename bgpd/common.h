@@ -30,8 +30,7 @@
 
 struct bgp_info_pair
 {
-  struct bgp_info *old;
-  struct bgp_info *new;
+  struct bgp_info *old;struct bgp_info *new;
 };
 
 #endif /* BGPD_COMMON_H_ */

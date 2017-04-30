@@ -58,7 +58,6 @@ Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 #include "bgpd/bgp_network.h"
 #include "bgpd/bgp_vty.h"
 #include "bgpd/bgp_mpath.h"
-#include "bgpd/wiser.h"
 #ifdef HAVE_SNMP
 #include "bgpd/bgp_snmp.h"
 #endif /* HAVE_SNMP */
@@ -5452,9 +5451,6 @@ bgp_init (void)
 
   /* Community list initialize. */
   bgp_clist = community_list_init ();
-
-  /* init tarpan */
-  tarpan_protocol_init ();
 
 #ifdef HAVE_SNMP
   bgp_snmp_init ();

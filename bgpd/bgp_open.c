@@ -501,6 +501,7 @@ bgp_capability_parse (struct peer *peer, size_t length, int *mp_capability,
           case CAPABILITY_CODE_ORF_OLD:
           case CAPABILITY_CODE_RESTART:
           case CAPABILITY_CODE_AS4:
+            // TODO (tarpan) add capabilities code here
           case CAPABILITY_CODE_DYNAMIC:
               /* Check length. */
               if (caphdr.length < cap_minsizes[caphdr.code])

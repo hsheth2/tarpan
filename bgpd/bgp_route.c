@@ -56,6 +56,7 @@ Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 #include "bgpd/bgp_zebra.h"
 #include "bgpd/bgp_vty.h"
 #include "bgpd/bgp_mpath.h"
+#include "bgpd/bgp_tarpan.h"
 
 /* Extern from bgp_dump.c */
 extern const char *bgp_origin_str[];
@@ -308,7 +309,7 @@ bgp_info_unset_flag (struct bgp_node *rn, struct bgp_info *ri, u_int32_t flag)
 
 /* Get MED value.  If MED value is missing and "bgp bestpath
    missing-as-worst" is specified, treat it as the worst value. */
-static u_int32_t
+u_int32_t
 bgp_med_value (struct attr *attr, struct bgp *bgp)
 {
   if (attr->flag & ATTR_FLAG_BIT (BGP_ATTR_MULTI_EXIT_DISC))
@@ -1315,8 +1316,6 @@ bgp_best_selection (struct bgp *bgp, struct bgp_node *rn,
   int paths_eq, do_mpath;
   struct list mp_list;
 
-  // TODO (tarpan) add route selection
-
   bgp_mp_list_init (&mp_list);
   do_mpath = (mpath_cfg->maxpaths_ebgp != BGP_DEFAULT_MAXPATHS ||
 	      mpath_cfg->maxpaths_ibgp != BGP_DEFAULT_MAXPATHS);
@@ -1402,7 +1401,12 @@ bgp_best_selection (struct bgp *bgp, struct bgp_node *rn,
       bgp_info_unset_flag (rn, ri, BGP_INFO_DMED_CHECK);
       bgp_info_unset_flag (rn, ri, BGP_INFO_DMED_SELECTED);
 
-      if (bgp_info_cmp (bgp, ri, new_select, &paths_eq))
+      int info_cmp_ret;
+      if (tarpan_active_handler && tarpan_active_handler->protocol_info_cmp)
+	info_cmp_ret = tarpan_active_handler->protocol_info_cmp(bgp, ri, new_select, &paths_eq);
+      else
+	info_cmp_ret = bgp_info_cmp (bgp, ri, new_select, &paths_eq);
+      if (info_cmp_ret)
 	{
 	  if (do_mpath && bgp_flag_check (bgp, BGP_FLAG_DETERMINISTIC_MED))
 	    bgp_mp_dmed_deselect (new_select);

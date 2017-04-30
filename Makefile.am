@@ -1,8 +1,9 @@
 ## Process this file with automake to produce Makefile.in.
+AM_CXXFLAGS=-std=c11
 
 SUBDIRS = lib @ZEBRA@ @BGPD@ @RIPD@ @RIPNGD@ @OSPFD@ @OSPF6D@ @BABELD@ \
          @ISISD@ @PIMD@ @WATCHQUAGGA@ @VTYSH@ @OSPFCLIENT@ @DOC@ m4 @pkgsrcdir@ \
-         redhat @SOLARIS@ tests
+         redhat @SOLARIS@ tests 
 
 DIST_SUBDIRS = lib zebra bgpd ripd ripngd ospfd ospf6d babeld \
 	  isisd watchquagga vtysh ospfclient doc m4 pkgsrc redhat tests \
