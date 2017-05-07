@@ -27,6 +27,8 @@ extern "C"
 #undef new
 }
 
+const int wiser_thread_pool_size = 4;
+
 // C++ code
 #include "bgpd/wiser_static_path_costs.hpp"
 #include "bgpd/wiser_costs.hpp"
@@ -41,6 +43,8 @@ void
 wiser_protocol_init (void)
 {
   zlog_info ("wiser_protocol_init: starting");
+
+  // thread pool already initialized
 
   // load static path costs from file
   wiser_static_path_costs_init ();
