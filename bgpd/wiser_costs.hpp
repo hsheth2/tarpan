@@ -23,7 +23,7 @@
 #include "bgpd/tarpan_backpropagation.pb-c.h"
 
 static std::mutex cost_mutex;
-ctpl::thread_pool wiser_thread_pool(wiser_thread_pool_size);
+ctpl::thread_pool wiser_thread_pool;
 static const int wiser_cost_portal_port = 2259;
 
 void

@@ -27,8 +27,6 @@ extern "C"
 #undef new
 }
 
-const int wiser_thread_pool_size = 4;
-
 // C++ code
 #include "bgpd/wiser_static_path_costs.hpp"
 #include "bgpd/wiser_costs.hpp"
@@ -39,12 +37,15 @@ struct tarpan_protocol_handler wiser_protocol_handler =
       .initialize_packet = wiser_initialize_packet, .update_packet =
 	  wiser_update_packet, .protocol_info_cmp = wiser_info_cmp, };
 
+const int wiser_thread_pool_size = 4;
+
 void
 wiser_protocol_init (void)
 {
   zlog_info ("wiser_protocol_init: starting");
 
-  // thread pool already initialized
+  // thread pool initialization
+  wiser_thread_pool.resize(wiser_thread_pool_size);
 
   // load static path costs from file
   wiser_static_path_costs_init ();
@@ -90,8 +91,7 @@ wiser_packet_received_handler (struct peer * const peer,
       // using the specified cost portal
 
       // must contact cost portal - not blocking
-      std::thread (wiser_contact_cost_portal, wiser, wiser->path_cost,
-		   peer->bgp).detach();
+      wiser_thread_pool.push(std::bind(wiser_contact_cost_portal, wiser, wiser->path_cost, peer->bgp));
     }
 
   // apply normalization to incoming path costs
