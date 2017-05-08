@@ -131,7 +131,7 @@ wiser_update_packet (struct peer * const peer, struct tarpan * tarpan)
     }
   assert(wiser);
 
-  wiser->path_cost = wiser_get_path_cost (peer->bgp->as, peer->as);
+  wiser->path_cost += wiser_get_path_cost (peer->bgp->as, peer->as);
   update_sent_cost (peer->as, wiser->path_cost);
 
   zlog_debug ("wiser_update_packet");
@@ -219,7 +219,8 @@ wiser_info_cmp (struct bgp *bgp, struct bgp_info *nw, struct bgp_info *exist,
     return 0;
 
   /* (3+i). Wiser cost check */
-  zlog_debug("wiser_info_cmp: new cost = %d vs old cost = %d", 
+  zlog_debug("wiser_info_cmp: (paths from AS %d and %d) new cost = %d vs old cost = %d", 
+    nw->peer->as, exist->peer->as,
     newattr->tarpan->message->wiser->path_cost, existattr->tarpan->message->wiser->path_cost);
   if (newattr->tarpan->message->wiser->path_cost
       < existattr->tarpan->message->wiser->path_cost)
