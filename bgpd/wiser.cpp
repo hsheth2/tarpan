@@ -215,11 +215,15 @@ wiser_info_cmp (struct bgp *bgp, struct bgp_info *nw, struct bgp_info *exist,
     return 0;
 
   /* (3+i). Wiser cost check */
-  if (newattr->tarpan->message->wiser->path_cost
-      > existattr->tarpan->message->wiser->path_cost)
-    return 1;
-  else
-    return 0;
+  if (newattr->tarpan && newattr->tarpan->message && newattr->tarpan->message->wiser
+      && existattr->tarpan && existattr->tarpan->message && existattr->tarpan->message->wiser)
+    {
+      if (newattr->tarpan->message->wiser->path_cost
+          > existattr->tarpan->message->wiser->path_cost)
+        return 1;
+      else
+        return 0;
+    }
 
   /* 4. AS path length check. */
   if (!bgp_flag_check (bgp, BGP_FLAG_ASPATH_IGNORE))
