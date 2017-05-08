@@ -22,7 +22,7 @@ install:
 
 script:
   - ./configure --disable-doc --enable-vtysh --disable-ripd --disable-ripngd --disable-ospfd --disable-ospf6d --disable-babeld --disable-isisd --disable-opaque-lsa --disable-ospfclient --disable-ospf-te
-  - sudo chmod -R 777 /var/run && sudo chmod -R 777 /usr/local/etc
+  - sudo mkdir -p /var/run/mininext && sudo chmod -R 777 /var/run/mininext && sudo chmod a+x /run /var/run
   - make && sudo make install && sudo ldconfig
   - sudo useradd -m quagga && sudo groupadd quaggavty && sudo usermod -a -G quaggavty quagga
 
