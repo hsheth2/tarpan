@@ -1,0 +1,9 @@
+#!/bin/bash
+cd /home/primes/routing-tables
+
+echo "Working on:"
+echo $1 # starts at 1
+
+./bgp_simple.pl -myas $(expr $1 + 1337 - 1) -myip 172.0.$(expr $1 + 9).1 -peerip 172.0.4.1 -peeras 400 -p routes0`expr $1 - 1` -n > /dev/null
+
+echo
