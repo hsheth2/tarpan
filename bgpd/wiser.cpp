@@ -149,7 +149,7 @@ int
 wiser_info_cmp (struct bgp *bgp, struct bgp_info *nw, struct bgp_info *exist,
 		int *paths_eq)
 {
-  zlog_debug ("wiser_info_cmp");
+  zlog_debug ("wiser_info_cmp - starting");
   struct attr *newattr, *existattr;
   struct attr_extra *newattre, *existattre;
   bgp_peer_sort_t new_sort;
@@ -219,11 +219,19 @@ wiser_info_cmp (struct bgp *bgp, struct bgp_info *nw, struct bgp_info *exist,
     return 0;
 
   /* (3+i). Wiser cost check */
+  zlog_debug("wiser_info_cmp: new cost = %d vs old cost = %d", 
+    newattr->tarpan->message->wiser->path_cost, existattr->tarpan->message->wiser->path_cost);
   if (newattr->tarpan->message->wiser->path_cost
-      > existattr->tarpan->message->wiser->path_cost)
-    return 1;
+      < existattr->tarpan->message->wiser->path_cost)
+    {
+      zlog_debug("wiser_info_cmp: choosing new path with cost");
+      return 1;
+    }
   else
-    return 0;
+    {
+      zlog_debug("wiser_info_cmp: remaining with previous path");
+      return 0;
+    }
 
   /* 4. AS path length check. */
   if (!bgp_flag_check (bgp, BGP_FLAG_ASPATH_IGNORE))
