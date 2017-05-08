@@ -2493,8 +2493,7 @@ bgp_packet_attribute (struct bgp *bgp, struct peer *peer,
 //      SET_FLAG(attr->flag, ATTR_FLAG_BIT (BGP_ATTR_TARPAN));
     }
   else {
-    tarpan_update_packet(peer, attr->tarpan);
-    tarpan_wire = attr->tarpan;
+    tarpan_wire = tarpan_update_packet(peer, attr->tarpan);
   }
 
   // No matter what, there will be a tarpan to send.
@@ -2511,6 +2510,7 @@ bgp_packet_attribute (struct bgp *bgp, struct peer *peer,
   zlog_info("Sent tarpan!");
 
   free(buf);
+  free(tarpan_wire);
 
   /* Route Reflector. */
   if (peer->sort == BGP_PEER_IBGP

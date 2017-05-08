@@ -169,12 +169,18 @@ tarpan_initialize_packet (struct peer * const peer, struct tarpan * tarp)
     tarpan_active_handler->initialize_packet (peer, tarp);
 }
 
-void
+struct tarpan *
 tarpan_update_packet (struct peer * const peer, struct tarpan * tarp)
 {
+  // copy tarpan packet
+  struct tarpan * tarpan = tarpan_new();
+  *tarpan = *tarp;
+
   // update protocol's information
   if (tarpan_active_handler)
-    tarpan_active_handler->update_packet (peer, tarp);
+    tarpan_active_handler->update_packet (peer, tarpan);
+
+  return tarpan;
 }
 
 struct tarpan *
