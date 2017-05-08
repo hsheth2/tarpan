@@ -45,7 +45,7 @@ wiser_protocol_init (void)
   zlog_info ("wiser_protocol_init: starting");
 
   // thread pool initialization
-  wiser_thread_pool.resize(wiser_thread_pool_size);
+  wiser_thread_pool.resize (wiser_thread_pool_size);
 
   // load static path costs from file
   wiser_static_path_costs_init ();
@@ -91,7 +91,9 @@ wiser_packet_received_handler (struct peer * const peer,
       // using the specified cost portal
 
       // must contact cost portal - not blocking
-      wiser_thread_pool.push(std::bind(wiser_contact_cost_portal, wiser, wiser->path_cost, peer->bgp));
+      wiser_thread_pool.push (
+	  std::bind (wiser_contact_cost_portal, wiser, wiser->path_cost,
+		     peer->bgp));
 
       // apply normalization to incoming path costs
       // only applies normalization to paths from over a gulf
@@ -221,19 +223,26 @@ wiser_info_cmp (struct bgp *bgp, struct bgp_info *nw, struct bgp_info *exist,
     return 0;
 
   /* (3+i). Wiser cost check */
-  zlog_debug("wiser_info_cmp: (paths from AS %d and %d) new cost = %d vs old cost = %d", 
-    nw->peer->as, exist->peer->as,
-    newattr->tarpan->message->wiser->path_cost, existattr->tarpan->message->wiser->path_cost);
-  if (newattr->tarpan && newattr->tarpan->message && newattr->tarpan->message->wiser
-      && existattr->tarpan && existattr->tarpan->message && existattr->tarpan->message->wiser)
+  if (newattr->tarpan && newattr->tarpan->message
+      && newattr->tarpan->message->wiser && existattr->tarpan
+      && existattr->tarpan->message && existattr->tarpan->message->wiser)
     {
+      zlog_debug (
+	  "wiser_info_cmp: (paths from AS %d and %d) new cost = %d vs old cost = %d",
+	  nw->peer->as, exist->peer->as,
+	  newattr->tarpan->message->wiser->path_cost,
+	  existattr->tarpan->message->wiser->path_cost);
       if (newattr->tarpan->message->wiser->path_cost
-          < existattr->tarpan->message->wiser->path_cost)
-        zlog_debug("wiser_info_cmp: choosing new path with cost");
-        return 1;
+	  < existattr->tarpan->message->wiser->path_cost)
+	{
+	  zlog_debug ("wiser_info_cmp: choosing new path with cost");
+	  return 1;
+	}
       else
-        zlog_debug("wiser_info_cmp: remaining with previous path");
-        return 0;
+	{
+	  zlog_debug ("wiser_info_cmp: remaining with previous path");
+	  return 0;
+	}
     }
 
   /* 4. AS path length check. */
