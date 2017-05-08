@@ -52,6 +52,21 @@ tarpan_new (void)
   return tarp;
 }
 
+static struct tarpan *
+tarpan_copy (struct tarpan * tarp)
+{
+  int length = tarpan_msg__get_packed_size(tarp->message);
+  uint8_t* buffer = malloc(length);
+  tarpan_msg__pack(tarp->message, buffer);
+
+  struct tarpan * tarpan = tarpan_new();
+  tarpan->message = tarpan_msg__unpack(NULL, length, buffer);
+  assert(tarpan->message);
+
+  free (buffer);
+  return tarpan;
+}
+
 /* Make hash value of tarpan attribute. This function is used by
  hash package.*/
 unsigned int
@@ -173,8 +188,7 @@ struct tarpan *
 tarpan_update_packet (struct peer * const peer, struct tarpan * tarp)
 {
   // copy tarpan packet
-  struct tarpan * tarpan = tarpan_new();
-  *tarpan = *tarp;
+  struct tarpan * tarpan = tarpan_copy(tarp);
 
   // update protocol's information
   if (tarpan_active_handler)
