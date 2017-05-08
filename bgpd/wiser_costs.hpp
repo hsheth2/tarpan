@@ -11,18 +11,19 @@
 #include <map>
 #include <unordered_map>
 #include <mutex>
-#include <thread>
 #include <vector>
 #include <stdio.h>
 #include <sys/socket.h>
 #include <stdlib.h>
 #include <netinet/in.h>
 #include <string.h>
+#include <functional>
 
+#include "bgpd/ctpl_stl.hpp"
 #include "bgpd/tarpan_backpropagation.pb-c.h"
 
 static std::mutex cost_mutex;
-static std::thread wiser_cost_portal_thread;
+ctpl::thread_pool wiser_thread_pool;
 static const int wiser_cost_portal_port = 2259;
 
 void
@@ -137,7 +138,8 @@ cost_portal (int server_fd, struct sockaddr_in address)
       if (new_socket < 0)
 	break;
 
-      std::thread (cost_portal_handle_connection, new_socket).detach();
+      zlog_debug("wiser: cost_portal handling incoming connection");
+      wiser_thread_pool.push(std::bind(cost_portal_handle_connection, new_socket));
     }
 
   close (server_fd);
@@ -169,7 +171,7 @@ wiser_cost_portal_init ()
     return 1;
 
   zlog_debug("wiser: starting cost_portal thread");
-  wiser_cost_portal_thread = std::thread (cost_portal, server_fd, address);
+  wiser_thread_pool.push(std::bind(cost_portal, server_fd, address));
   return 0;
 }
 

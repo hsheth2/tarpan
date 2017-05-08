@@ -62,7 +62,7 @@ extern struct tarpan *
 tarpan_new (void);
 extern void
 tarpan_initialize_packet (struct peer * const peer, struct tarpan * tarpan);
-extern void
+extern struct tarpan *
 tarpan_update_packet (struct peer * const peer, struct tarpan * tarp);
 extern void
 tarpan_init (void);

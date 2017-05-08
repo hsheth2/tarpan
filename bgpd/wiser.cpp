@@ -37,10 +37,15 @@ struct tarpan_protocol_handler wiser_protocol_handler =
       .initialize_packet = wiser_initialize_packet, .update_packet =
 	  wiser_update_packet, .protocol_info_cmp = wiser_info_cmp, };
 
+const int wiser_thread_pool_size = 4;
+
 void
 wiser_protocol_init (void)
 {
   zlog_info ("wiser_protocol_init: starting");
+
+  // thread pool initialization
+  wiser_thread_pool.resize(wiser_thread_pool_size);
 
   // load static path costs from file
   wiser_static_path_costs_init ();
@@ -86,12 +91,13 @@ wiser_packet_received_handler (struct peer * const peer,
       // using the specified cost portal
 
       // must contact cost portal - not blocking
-      std::thread (wiser_contact_cost_portal, wiser, wiser->path_cost,
-		   peer->bgp).detach();
+      wiser_thread_pool.push(std::bind(wiser_contact_cost_portal, wiser, wiser->path_cost, peer->bgp));
+
+      // apply normalization to incoming path costs
+      // only applies normalization to paths from over a gulf
+      wiser->path_cost *= normalization (peer->as);
     }
 
-  // apply normalization to incoming path costs
-  wiser->path_cost *= normalization (peer->as);
 }
 
 void
@@ -127,7 +133,7 @@ wiser_update_packet (struct peer * const peer, struct tarpan * tarpan)
     }
   assert(wiser);
 
-  wiser->path_cost = wiser_get_path_cost (peer->bgp->as, peer->as);
+  wiser->path_cost += wiser_get_path_cost (peer->bgp->as, peer->as);
   update_sent_cost (peer->as, wiser->path_cost);
 
   zlog_debug ("wiser_update_packet");
@@ -145,7 +151,7 @@ int
 wiser_info_cmp (struct bgp *bgp, struct bgp_info *nw, struct bgp_info *exist,
 		int *paths_eq)
 {
-  zlog_debug ("wiser_info_cmp");
+  zlog_debug ("wiser_info_cmp - starting");
   struct attr *newattr, *existattr;
   struct attr_extra *newattre, *existattre;
   bgp_peer_sort_t new_sort;
@@ -215,13 +221,18 @@ wiser_info_cmp (struct bgp *bgp, struct bgp_info *nw, struct bgp_info *exist,
     return 0;
 
   /* (3+i). Wiser cost check */
+  zlog_debug("wiser_info_cmp: (paths from AS %d and %d) new cost = %d vs old cost = %d", 
+    nw->peer->as, exist->peer->as,
+    newattr->tarpan->message->wiser->path_cost, existattr->tarpan->message->wiser->path_cost);
   if (newattr->tarpan && newattr->tarpan->message && newattr->tarpan->message->wiser
       && existattr->tarpan && existattr->tarpan->message && existattr->tarpan->message->wiser)
     {
       if (newattr->tarpan->message->wiser->path_cost
-          > existattr->tarpan->message->wiser->path_cost)
+          < existattr->tarpan->message->wiser->path_cost)
+        zlog_debug("wiser_info_cmp: choosing new path with cost");
         return 1;
       else
+        zlog_debug("wiser_info_cmp: remaining with previous path");
         return 0;
     }
 
