@@ -76,6 +76,10 @@ int
 wiser_get_path_cost (int as1, int as2)
 {
   uint64_t as_pair = (uint64_t) std::min (as1, as2) << 32 | std::max (as1, as2);
+  if (path_costs.find(as_pair) == path_costs.end())
+    {
+      return INT16_MAX;
+    }
   return path_costs[as_pair];
 }
 
