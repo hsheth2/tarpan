@@ -81,7 +81,7 @@ cost_portal_handle_connection (int socket)
       if (bytes_read == 0)
 	break;
 
-      zlog_debug ("Message size is %d", message_size);
+      zlog_debug("Message size is %d", message_size);
       if (message_size > 4000000)
 	{
 	  zlog_warn ("Message size too large: %d", message_size);
@@ -130,7 +130,7 @@ cost_portal (int server_fd, struct sockaddr_in address)
   int addrlen = sizeof(address);
   int new_socket;
 
-  zlog_debug ("wiser: cost_portal open and listening for connections");
+  zlog_debug("wiser: cost_portal open and listening for connections");
 
   while ((new_socket = accept (server_fd, (struct sockaddr *) &address,
 			       (socklen_t*) &addrlen)))
@@ -138,9 +138,8 @@ cost_portal (int server_fd, struct sockaddr_in address)
       if (new_socket < 0)
 	break;
 
-      zlog_debug ("wiser: cost_portal handling incoming connection");
-      wiser_thread_pool.push (
-	  std::bind (cost_portal_handle_connection, new_socket));
+      zlog_debug("wiser: cost_portal handling incoming connection");
+      wiser_thread_pool.push(std::bind(cost_portal_handle_connection, new_socket));
     }
 
   close (server_fd);
@@ -171,8 +170,8 @@ wiser_cost_portal_init ()
   if (listen (server_fd, 3) < 0)
     return 1;
 
-  zlog_debug ("wiser: starting cost_portal thread");
-  wiser_thread_pool.push (std::bind (cost_portal, server_fd, address));
+  zlog_debug("wiser: starting cost_portal thread");
+  wiser_thread_pool.push(std::bind(cost_portal, server_fd, address));
   return 0;
 }
 
@@ -183,8 +182,7 @@ wiser_contact_cost_portal (Wiser* wiser, uint32_t cost, struct bgp * self)
   int sock = 0, valread;
   struct sockaddr_in serv_addr;
 
-  zlog_debug ("wiser: attempting to contact cost portal of as %d",
-	      wiser->sender_as);
+  zlog_debug("wiser: attempting to contact cost portal of as %d", wiser->sender_as);
 
   if ((sock = socket (AF_INET, SOCK_STREAM, 0)) < 0)
     return 1;

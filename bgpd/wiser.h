@@ -31,9 +31,6 @@ extern "C"
   wiser_initialize_packet (struct peer * const peer, struct tarpan * tarpan);
 
   void
-  wiser_augment_packet (struct peer * const peer, struct tarpan * tarpan);
-
-  void
   wiser_update_packet (struct peer * const peer, struct tarpan * tarpan);
 
   int
