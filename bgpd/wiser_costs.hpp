@@ -222,6 +222,7 @@ static double
 normalization (as_t peer)
 {
   std::lock_guard<std::mutex> guard (cost_mutex);
+  return 1.0; // TODO: enable normalization at some point
 
   // TODO: come up with a better system for handling 0
   uint32_t total_send = 1 + advcost_sent[peer];
