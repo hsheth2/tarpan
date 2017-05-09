@@ -76,6 +76,9 @@ wiser_packet_received_handler (struct peer * const peer,
   Wiser* wiser = tarp->message->wiser;
   zlog_debug ("wiser_packet_received_handler");
 
+  // add cost to self
+  wiser->path_cost += wiser_get_path_cost(peer->as, peer->bgp->as);
+
   // update recv costs
   update_recv_cost (wiser->sender_as, wiser->path_cost);
 
@@ -109,7 +112,7 @@ wiser_initialize_packet (struct peer * const peer, struct tarpan * tarpan)
   wiser__init (wiser);
   tarpan->message->wiser = wiser;
 
-  wiser->path_cost = wiser_get_path_cost (peer->bgp->as, peer->as);
+  wiser->path_cost = 0;
 
   update_sent_cost (peer->as, wiser->path_cost);
 
@@ -135,7 +138,6 @@ wiser_update_packet (struct peer * const peer, struct tarpan * tarpan)
     }
   assert(wiser);
 
-  wiser->path_cost += wiser_get_path_cost (peer->bgp->as, peer->as);
   update_sent_cost (peer->as, wiser->path_cost);
 
   zlog_debug ("wiser_update_packet");
