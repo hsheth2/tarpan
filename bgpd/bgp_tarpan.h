@@ -38,6 +38,10 @@ struct tarpan_protocol_handler
   void
   (*initialize_packet) (struct peer * const peer, struct tarpan * tarpan);
 
+  // called when a received packet does not contain any tarpan data
+  void
+  (*augment_packet) (struct peer * const peer, struct tarpan * attr);
+
   // called when forwarding an existing tarpan attribute
   void
   (*update_packet) (struct peer * const peer, struct tarpan * tarpan);
@@ -62,6 +66,8 @@ extern struct tarpan *
 tarpan_new (void);
 extern void
 tarpan_initialize_packet (struct peer * const peer, struct tarpan * tarpan);
+extern void
+tarpan_augment_packet(struct peer * const peer, struct attr * attr);
 extern struct tarpan *
 tarpan_update_packet (struct peer * const peer, struct tarpan * tarp);
 extern void

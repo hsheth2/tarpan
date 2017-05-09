@@ -13,6 +13,7 @@
 
 #include "bgpd/common.h"
 #include "bgpd/bgp_tarpan.h"
+#include "bgpd/bgp_attr.h"
 #include "bgpd/attr_tarpan.pb-c.h"
 
 // include possible protocols
@@ -182,6 +183,21 @@ tarpan_initialize_packet (struct peer * const peer, struct tarpan * tarp)
   // initialize default protocol's information
   if (tarpan_active_handler)
     tarpan_active_handler->initialize_packet (peer, tarp);
+}
+
+void
+tarpan_augment_packet(struct peer * const peer, struct attr * attr)
+{
+  attr->tarpan = tarpan_new();
+  struct tarpan * tarp = attr->tarpan;
+
+  tarp->message = malloc (sizeof(TarpanMsg));
+  tarpan_msg__init (tarp->message);
+  tarp->message->version = TARPAN_VERSION;
+
+  // initialize default protocol's information
+  if (tarpan_active_handler)
+    tarpan_active_handler->augment_packet (peer, tarp);
 }
 
 struct tarpan *
