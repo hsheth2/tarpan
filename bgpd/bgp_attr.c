@@ -2123,13 +2123,6 @@ bgp_attr_parse (struct peer *peer, struct attr *attr, bgp_size_t size,
       }
   }
 
-  // create tarpan attribute if none currently exists
-  if (!attr->tarpan)
-    {
-      // will initialize attr->tarpan
-      tarpan_augment_packet(peer, attr);
-    }
-
   /* 
    * At this place we can see whether we got AS4_PATH and/or
    * AS4_AGGREGATOR from a 16Bit peer and act accordingly.

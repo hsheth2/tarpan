@@ -34,9 +34,8 @@ extern "C"
 // C++14 does support designated initializers
 struct tarpan_protocol_handler wiser_protocol_handler =
   { .packet_received_handler = wiser_packet_received_handler,
-      .initialize_packet = wiser_initialize_packet, .augment_packet =
-	  wiser_augment_packet, .update_packet = wiser_update_packet,
-      .protocol_info_cmp = wiser_info_cmp, };
+      .initialize_packet = wiser_initialize_packet, .update_packet =
+	  wiser_update_packet, .protocol_info_cmp = wiser_info_cmp, };
 
 const int wiser_thread_pool_size = 4;
 
@@ -71,13 +70,6 @@ wiser_packet_received_handler (struct peer * const peer,
   if (!tarp->message->wiser)
     {
       // the incoming packet does not have wiser data
-
-      // add the incoming path cost
-      tarp->message->wiser = (Wiser*) malloc (sizeof(Wiser));
-      wiser__init (tarp->message->wiser);
-      tarp->message->wiser->path_cost = wiser_get_path_cost (peer->as,
-							     peer->bgp->as);
-
       return;
     }
 
@@ -130,16 +122,6 @@ wiser_initialize_packet (struct peer * const peer, struct tarpan * tarpan)
 
   wiser->sender_as = peer->bgp->as;
   wiser->sender_address = local_addr;
-}
-
-void
-wiser_augment_packet (struct peer * const peer, struct tarpan * tarp)
-{
-  // add the incoming path cost
-  tarp->message->wiser = (Wiser*) malloc (sizeof(Wiser));
-  wiser__init (tarp->message->wiser);
-  tarp->message->wiser->path_cost = wiser_get_path_cost (peer->as,
-							 peer->bgp->as);
 }
 
 void
