@@ -55,24 +55,30 @@ tarpan_new (void)
 TarpanMsg*
 tarpan_message_new(void)
 {
-  TarpanMsg* message = (TarpanMsg*) malloc (sizeof(TarpanMsg));
+  TarpanMsg* message = (TarpanMsg*) XCALLOC(MTYPE_TARPAN, sizeof(TarpanMsg));
   tarpan_msg__init (message);
   message->version = TARPAN_VERSION;
+
+  zlog_debug("tarpan_message_new %p", message);
+
   return message;
 }
 
 static struct tarpan *
 tarpan_copy (struct tarpan * tarp)
 {
-  int length = tarpan_msg__get_packed_size(tarp->message);
-  uint8_t* buffer = malloc(length);
-  tarpan_msg__pack(tarp->message, buffer);
+  struct tarpan * tarpan = tarpan_new(); // tarpan->refcnt = 0
 
-  struct tarpan * tarpan = tarpan_new();
-  tarpan->message = tarpan_msg__unpack(NULL, length, buffer);
-  assert(tarpan->message);
+  if (tarp->message)
+    {
+      int length = tarpan_msg__get_packed_size(tarp->message);
+      uint8_t* buffer = malloc(length);
+      tarpan_msg__pack(tarp->message, buffer);
+      tarpan->message = tarpan_msg__unpack(NULL, length, buffer);
+      free (buffer);
+      assert(tarpan->message);
+    }
 
-  free (buffer);
   return tarpan;
 }
 
