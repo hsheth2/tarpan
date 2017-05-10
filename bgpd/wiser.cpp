@@ -66,6 +66,7 @@ wiser_packet_received_handler (struct peer * const peer,
 			       struct attr * const attr)
 {
   struct tarpan * tarp = attr->tarpan;
+  bool previous_supported = true;
 
   if (!tarp->message->wiser)
     {
@@ -74,6 +75,7 @@ wiser_packet_received_handler (struct peer * const peer,
       Wiser* wiser = (Wiser*) malloc (sizeof(Wiser));
       wiser__init (wiser);
       tarp->message->wiser = wiser;
+      previous_supported = false;
     }
 
   Wiser* wiser = tarp->message->wiser;
@@ -84,6 +86,9 @@ wiser_packet_received_handler (struct peer * const peer,
 
   // update recv costs
   update_recv_cost (wiser->sender_as, wiser->path_cost);
+
+  if (!previous_supported)
+    return;
 
   // determine if the packet was sent via a gulf,
   // or if it was sent directly (within same island)
