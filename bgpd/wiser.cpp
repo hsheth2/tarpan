@@ -70,7 +70,10 @@ wiser_packet_received_handler (struct peer * const peer,
   if (!tarp->message->wiser)
     {
       // the incoming packet does not have wiser data
-      return;
+      // -> we create the wiser data
+      Wiser* wiser = (Wiser*) malloc (sizeof(Wiser));
+      wiser__init (wiser);
+      tarp->message->wiser = wiser;
     }
 
   Wiser* wiser = tarp->message->wiser;

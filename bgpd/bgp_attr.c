@@ -2123,6 +2123,19 @@ bgp_attr_parse (struct peer *peer, struct attr *attr, bgp_size_t size,
       }
   }
 
+  /* Ensure that tarpan attribute is present */
+  if (!CHECK_FLAG(attr->flag, ATTR_FLAG_BIT (BGP_ATTR_TARPAN)))
+    {
+      attr->flag |= ATTR_FLAG_BIT (BGP_ATTR_TARPAN);
+      attr->tarpan = tarpan_new();
+      attr->tarpan->message = tarpan_message_new();
+
+      if (tarpan_active_handler) {
+        zlog_info("Calling tarpan api packet_received_handler on default tarpan attribute");
+        tarpan_active_handler->packet_received_handler(peer, attr);
+      }
+    }
+
   /* 
    * At this place we can see whether we got AS4_PATH and/or
    * AS4_AGGREGATOR from a 16Bit peer and act accordingly.
