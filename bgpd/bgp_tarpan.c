@@ -52,6 +52,15 @@ tarpan_new (void)
   return tarp;
 }
 
+TarpanMsg*
+tarpan_message_new(void)
+{
+  TarpanMsg* message = (TarpanMsg*) malloc (sizeof(TarpanMsg));
+  tarpan_msg__init (message);
+  message->version = TARPAN_VERSION;
+  return message;
+}
+
 static struct tarpan *
 tarpan_copy (struct tarpan * tarp)
 {
@@ -175,9 +184,7 @@ tarpan_finish (void)
 void
 tarpan_initialize_packet (struct peer * const peer, struct tarpan * tarp)
 {
-  tarp->message = malloc (sizeof(TarpanMsg));
-  tarpan_msg__init (tarp->message);
-  tarp->message->version = TARPAN_VERSION;
+  tarp->message = tarpan_message_new();
 
   // initialize default protocol's information
   if (tarpan_active_handler)
