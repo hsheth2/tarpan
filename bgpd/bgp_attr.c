@@ -2130,6 +2130,8 @@ bgp_attr_parse (struct peer *peer, struct attr *attr, bgp_size_t size,
       attr->tarpan = tarpan_new();
       attr->tarpan->message = tarpan_message_new();
 
+      attr->tarpan = tarpan_intern(attr->tarpan);
+
       if (tarpan_active_handler) {
         zlog_info("Calling tarpan api packet_received_handler on default tarpan attribute");
         tarpan_active_handler->packet_received_handler(peer, attr);
