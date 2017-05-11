@@ -39,6 +39,20 @@ struct tarpan_protocol_handler wiser_protocol_handler =
 
 const int wiser_thread_pool_size = 4;
 
+Wiser*
+wiser_new_default (void)
+{
+  Wiser* wiser = (Wiser*) XCALLOC(MTYPE_TARPAN, sizeof(Wiser));
+  wiser__init (wiser);
+
+  // create blank IPAddress
+  IPAddress* local_addr = (IPAddress*) XCALLOC(MTYPE_TARPAN, sizeof(IPAddress));
+  ipaddress__init (local_addr);
+  wiser->sender_address = local_addr;
+
+  return wiser;
+}
+
 void
 wiser_protocol_init (void)
 {
@@ -72,9 +86,9 @@ wiser_packet_received_handler (struct peer * const peer,
     {
       // the incoming packet does not have wiser data
       // -> we create the wiser data
-      Wiser* wiser = (Wiser*) malloc (sizeof(Wiser));
-      wiser__init (wiser);
+      Wiser* wiser = wiser_new_default();
       tarp->message->wiser = wiser;
+
       previous_supported = false;
     }
 
@@ -116,8 +130,7 @@ wiser_packet_received_handler (struct peer * const peer,
 void
 wiser_initialize_packet (struct peer * const peer, struct tarpan * tarpan)
 {
-  Wiser* wiser = (Wiser*) malloc (sizeof(Wiser));
-  wiser__init (wiser);
+  Wiser* wiser = wiser_new_default();
   tarpan->message->wiser = wiser;
 
   wiser->path_cost = 0;
@@ -127,12 +140,8 @@ wiser_initialize_packet (struct peer * const peer, struct tarpan * tarpan)
   zlog_debug ("wiser_initialize_packet");
 
   // place this node's AS/IP address in wiser data
-  IPAddress* local_addr = (IPAddress*) malloc (sizeof(IPAddress));
-  ipaddress__init (local_addr);
-  local_addr->bytes = peer->bgp->router_id.s_addr;
-
+  wiser->sender_address->bytes = peer->bgp->router_id.s_addr;
   wiser->sender_as = peer->bgp->as;
-  wiser->sender_address = local_addr;
 }
 
 void
