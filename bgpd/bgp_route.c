@@ -36,6 +36,7 @@ Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 #include "workqueue.h"
 
 #include "bgpd/bgpd.h"
+#include "bgpd/common.h"
 #include "bgpd/bgp_table.h"
 #include "bgpd/bgp_route.h"
 #include "bgpd/bgp_attr.h"
@@ -55,6 +56,7 @@ Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 #include "bgpd/bgp_zebra.h"
 #include "bgpd/bgp_vty.h"
 #include "bgpd/bgp_mpath.h"
+#include "bgpd/bgp_tarpan.h"
 
 /* Extern from bgp_dump.c */
 extern const char *bgp_origin_str[];
@@ -307,7 +309,7 @@ bgp_info_unset_flag (struct bgp_node *rn, struct bgp_info *ri, u_int32_t flag)
 
 /* Get MED value.  If MED value is missing and "bgp bestpath
    missing-as-worst" is specified, treat it as the worst value. */
-static u_int32_t
+u_int32_t
 bgp_med_value (struct attr *attr, struct bgp *bgp)
 {
   if (attr->flag & ATTR_FLAG_BIT (BGP_ATTR_MULTI_EXIT_DISC))
@@ -1300,12 +1302,6 @@ bgp_announce_check_rsclient (struct bgp_info *ri, struct peer *rsclient,
   return 1;
 }
 
-struct bgp_info_pair
-{
-  struct bgp_info *old;
-  struct bgp_info *new;
-};
-
 static void
 bgp_best_selection (struct bgp *bgp, struct bgp_node *rn,
 		    struct bgp_maxpaths_cfg *mpath_cfg,
@@ -1405,7 +1401,12 @@ bgp_best_selection (struct bgp *bgp, struct bgp_node *rn,
       bgp_info_unset_flag (rn, ri, BGP_INFO_DMED_CHECK);
       bgp_info_unset_flag (rn, ri, BGP_INFO_DMED_SELECTED);
 
-      if (bgp_info_cmp (bgp, ri, new_select, &paths_eq))
+      int info_cmp_ret;
+      if (tarpan_active_handler && tarpan_active_handler->protocol_info_cmp)
+	info_cmp_ret = tarpan_active_handler->protocol_info_cmp(bgp, ri, new_select, &paths_eq);
+      else
+	info_cmp_ret = bgp_info_cmp (bgp, ri, new_select, &paths_eq);
+      if (info_cmp_ret)
 	{
 	  if (do_mpath && bgp_flag_check (bgp, BGP_FLAG_DETERMINISTIC_MED))
 	    bgp_mp_dmed_deselect (new_select);
@@ -6106,6 +6107,8 @@ route_vty_out_detail (struct vty *vty, struct bgp *bgp, struct prefix *p,
 	  vty_out (vty, "%s", VTY_NEWLINE);
 	}
       
+      // TODO (tarpan) display tarpan structure data for vtysh
+
       if (binfo->extra && binfo->extra->damp_info)
 	bgp_damp_info_vty (vty, binfo);
 
@@ -6302,6 +6305,9 @@ bgp_show_table (struct vty *vty, struct bgp_table *table, struct in_addr *router
 		if (! community_list_exact_match (ri->attr->community, list))
 		  continue;
 	      }
+
+	    // TODO (tarpan) show tarpan data in the table
+
 	    if (type == bgp_show_type_flap_address
 		|| type == bgp_show_type_flap_prefix)
 	      {

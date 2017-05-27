@@ -114,7 +114,7 @@ bgp_node_to_rnode (struct bgp_node *node)
 static inline struct bgp_table *
 bgp_node_table (struct bgp_node *node)
 {
-  return bgp_node_to_rnode (node)->table->info;
+  return (struct bgp_table*) bgp_node_to_rnode (node)->table->info;
 }
 
 /*

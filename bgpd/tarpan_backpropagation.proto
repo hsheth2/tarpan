@@ -1,0 +1,15 @@
+syntax = "proto2";
+
+message WiserBack {
+	required uint32 as = 1;
+	required uint32 cost = 2;
+}
+
+message TarpanBackpropagation {
+	// 1-15 are reserved for internal use
+	optional int32 ping = 1;	
+	optional bool close = 2; // closes the connection
+	
+	// Add own protocols here
+	optional WiserBack wiser_back = 16;
+}

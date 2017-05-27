@@ -1,0 +1,29 @@
+// works with only proto2
+syntax = "proto2";
+
+message IPAddress {
+	required uint32 bytes = 1;
+	// TODO: IPv6 support?
+}
+
+message Wiser {
+	// start field numbering at 64
+	required uint32 path_cost = 64;
+	
+	required uint32 sender_as = 65;
+	required IPAddress sender_address = 66; // used for contacting the cost portal
+}
+
+message Pathlets {
+	repeated int32 meow = 1;
+}
+
+message TarpanMsg {
+	// reserving tags 1-31 for tarpan internal use
+	required uint32 version = 1;
+
+	optional Wiser wiser = 32;
+	optional Pathlets pathlets = 33;
+	// when other stuff is added, it is simply passes through
+	// each additional protocol will be assigned a number for use within this tarpan message
+}

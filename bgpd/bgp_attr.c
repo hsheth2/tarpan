@@ -35,6 +35,7 @@
 #include "bgpd/bgp_route.h"
 #include "bgpd/bgp_aspath.h"
 #include "bgpd/bgp_community.h"
+#include "bgpd/bgp_tarpan.h"
 #include "bgpd/bgp_debug.h"
 #include "bgpd/bgp_packet.h"
 #include "bgpd/bgp_ecommunity.h"
@@ -60,7 +61,8 @@ static const struct message attr_str[] =
     { BGP_ATTR_EXT_COMMUNITIES, "EXT_COMMUNITIES" },
     { BGP_ATTR_AS4_PATH, "AS4_PATH" },
     { BGP_ATTR_AS4_AGGREGATOR, "AS4_AGGREGATOR" },
-    { BGP_ATTR_AS_PATHLIMIT, "AS_PATHLIMIT" }, };
+    { BGP_ATTR_AS_PATHLIMIT, "AS_PATHLIMIT" },
+    { BGP_ATTR_TARPAN, "TARPAN" } };
 static const int attr_str_max = array_size (attr_str);
 
 static const struct message attr_flag_str[] =
@@ -384,6 +386,8 @@ attrhash_key_make (void *p)
     MIX(aspath_key_make (attr->aspath));
   if (attr->community)
     MIX(community_hash_make (attr->community));
+  if (attr->tarpan)
+    MIX(tarpan_hash_make (attr->tarpan));
 
   if (extra)
     {
@@ -413,7 +417,8 @@ attrhash_cmp (const void *p1, const void *p2)
   if (attr1->flag == attr2->flag && attr1->origin == attr2->origin
       && attr1->nexthop.s_addr == attr2->nexthop.s_addr
       && attr1->aspath == attr2->aspath && attr1->community == attr2->community
-      && attr1->med == attr2->med && attr1->local_pref == attr2->local_pref)
+      && attr1->tarpan == attr2->tarpan && attr1->med == attr2->med
+      && attr1->local_pref == attr2->local_pref)
     {
       const struct attr_extra *ae1 = attr1->extra;
       const struct attr_extra *ae2 = attr2->extra;
@@ -496,7 +501,7 @@ bgp_attr_intern (struct attr *attr)
 {
   struct attr *find;
 
-  /* Intern referenced strucutre. */
+  /* Intern referenced structure. */
   if (attr->aspath)
     {
       if (!attr->aspath->refcnt)
@@ -510,6 +515,13 @@ bgp_attr_intern (struct attr *attr)
 	attr->community = community_intern (attr->community);
       else
 	attr->community->refcnt++;
+    }
+  if (attr->tarpan) // MARK (tarpan) here we intern the tarpan attribute
+    {
+      if (!attr->tarpan->refcnt)
+	attr->tarpan = tarpan_intern (attr->tarpan);
+      else
+	attr->tarpan->refcnt++;
     }
   if (attr->extra)
     {
@@ -614,6 +626,10 @@ bgp_attr_aggregate_intern (struct bgp *bgp, u_char origin,
       attr.flag |= ATTR_FLAG_BIT(BGP_ATTR_COMMUNITIES);
     }
 
+  /* (tarpan) note: tarpan is not needed here because it is an optional,
+   * transitive attribute and therefore does not play role in aggregation
+   */
+
   attre.weight = BGP_ATTR_DEFAULT_WEIGHT;
 #ifdef HAVE_IPV6
   attre.mp_nexthop_len = IPV6_MAX_BYTELEN;
@@ -645,6 +661,10 @@ bgp_attr_unintern_sub (struct attr *attr)
   if (attr->community)
     community_unintern (&attr->community);
   UNSET_FLAG(attr->flag, ATTR_FLAG_BIT (BGP_ATTR_COMMUNITIES));
+
+  if (attr->tarpan)
+    tarpan_unintern (&attr->tarpan);
+  UNSET_FLAG(attr->flag, ATTR_FLAG_BIT (BGP_ATTR_TARPAN));
 
   if (attr->extra)
     {
@@ -701,6 +721,8 @@ bgp_attr_flush (struct attr *attr)
     aspath_free (attr->aspath);
   if (attr->community && !attr->community->refcnt)
     community_free (attr->community);
+  if (attr->tarpan && !attr->tarpan->refcnt)
+    tarpan_free (attr->tarpan);
   if (attr->extra)
     {
       struct attr_extra *attre = attr->extra;
@@ -1659,6 +1681,40 @@ bgp_attr_ext_communities (struct bgp_attr_parser_args *args)
   return BGP_ATTR_PARSE_PROCEED;
 }
 
+/* Tarpan attribute */
+static bgp_attr_parse_ret_t
+bgp_tarpan_parse (struct bgp_attr_parser_args *args)
+{
+  struct peer * const peer = args->peer;
+  struct attr * const attr = args->attr;
+  const bgp_size_t length = args->length;
+
+  if (length == 0)
+    {
+      attr->tarpan = NULL;
+      return BGP_ATTR_PARSE_PROCEED;
+    }
+
+  attr->tarpan = tarpan_parse ((u_int8_t *) stream_pnt (peer->ibuf), length);
+
+  stream_forward_getp (peer->ibuf, length);
+
+  if (!attr->tarpan)
+    return bgp_attr_malformed (args,
+    BGP_NOTIFY_UPDATE_OPT_ATTR_ERR,
+			       args->total);
+
+  attr->flag |= ATTR_FLAG_BIT(BGP_ATTR_TARPAN);
+
+  if (tarpan_active_handler)
+    {
+      zlog_info ("Calling tarpan api packet_received_handler");
+      tarpan_active_handler->packet_received_handler (peer, attr);
+    }
+
+  return BGP_ATTR_PARSE_PROCEED;
+}
+
 /* BGP unknown attribute treatment. */
 //P deal with unknown attr's
 static bgp_attr_parse_ret_t
@@ -1967,6 +2023,10 @@ bgp_attr_parse (struct peer *peer, struct attr *attr, bgp_size_t size,
 	case BGP_ATTR_EXT_COMMUNITIES:
 	  ret = bgp_attr_ext_communities (&attr_args);
 	  break;
+	case BGP_ATTR_TARPAN:
+	  // (tarpan) deal with incoming packet
+	  ret = bgp_tarpan_parse (&attr_args);
+	  break;
 	default:
 	  ret = bgp_attr_unknown (&attr_args);
 	  break;
@@ -2024,6 +2084,23 @@ bgp_attr_parse (struct peer *peer, struct attr *attr, bgp_size_t size,
       if (as4_path)
 	aspath_unintern (&as4_path);
       return BGP_ATTR_PARSE_ERROR;
+    }
+
+  /* Ensure that tarpan attribute is present */
+  if (!CHECK_FLAG(attr->flag, ATTR_FLAG_BIT (BGP_ATTR_TARPAN)))
+    {
+      attr->flag |= ATTR_FLAG_BIT(BGP_ATTR_TARPAN);
+      attr->tarpan = tarpan_new ();
+      attr->tarpan->message = tarpan_message_new ();
+
+      attr->tarpan = tarpan_intern (attr->tarpan);
+
+      if (tarpan_active_handler)
+	{
+	  zlog_info (
+	      "Calling tarpan api packet_received_handler on default tarpan attribute");
+	  tarpan_active_handler->packet_received_handler (peer, attr);
+	}
     }
 
   /* Check all mandatory well-known attributes are present */
@@ -2399,6 +2476,41 @@ bgp_packet_attribute (struct bgp *bgp, struct peer *peer, struct stream *s,
       stream_put (s, attr->community->val, attr->community->size * 4);
     }
 
+  struct tarpan * tarpan_wire;
+  // (tarpan) here is where tarpan serialization is going
+  if (!(attr->flag & ATTR_FLAG_BIT(BGP_ATTR_TARPAN)))
+    {
+      // create a new tarpan attribute
+      zlog_info ("Creating a new tarpan!");
+
+      struct tarpan * tarp = tarpan_new ();
+      tarpan_initialize_packet (peer, tarp);
+
+      tarpan_wire = tarp;
+//      SET_FLAG(attr->flag, ATTR_FLAG_BIT (BGP_ATTR_TARPAN));
+    }
+  else
+    {
+      tarpan_wire = tarpan_update_packet (peer, attr->tarpan);
+    }
+
+  // No matter what, there will be a tarpan to send.
+  assert(tarpan_wire);
+  stream_putc (
+      s, BGP_ATTR_FLAG_OPTIONAL | BGP_ATTR_FLAG_TRANS | BGP_ATTR_FLAG_EXTLEN); // we always use extended length
+  stream_putc (s, BGP_ATTR_TARPAN);
+
+  unsigned int len = tarpan_msg__get_packed_size (tarpan_wire->message);
+  void *buf = malloc (len);
+  tarpan_msg__pack (tarpan_wire->message, buf);
+
+  stream_putw (s, len);
+  stream_put (s, buf, len);
+  zlog_info ("Sent tarpan!");
+
+  free (buf);
+  free (tarpan_wire);
+
   /* Route Reflector. */
   if (peer->sort == BGP_PEER_IBGP && from && from->sort == BGP_PEER_IBGP)
     {
@@ -2620,6 +2732,7 @@ bgp_attr_init (void)
   aspath_init ();
   attrhash_init ();
   community_init ();
+  tarpan_init ();
   ecommunity_init ();
   cluster_init ();
   transit_init ();
@@ -2631,6 +2744,7 @@ bgp_attr_finish (void)
   aspath_finish ();
   attrhash_finish ();
   community_finish ();
+  tarpan_finish ();
   ecommunity_finish ();
   cluster_finish ();
   transit_finish ();
@@ -2738,6 +2852,8 @@ bgp_dump_routes_attr (struct stream *s, struct attr *attr,
 	}
       stream_put (s, attr->community->val, attr->community->size * 4);
     }
+
+  // TODO (tarpan) add tarpan implementation to bgp_dump_routes_attr
 
 #ifdef HAVE_IPV6
   /* Add a MP_NLRI attribute to dump the IPv6 next hop */

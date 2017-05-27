@@ -94,8 +94,11 @@ struct attr
   struct aspath *aspath;
 
   /* Community structure */
-  struct community *community;	
+  struct community *community;
   
+  /* Tarpan structure */
+  struct tarpan *tarpan;
+
   /* Lazily allocated pointer to extra attributes */
   struct attr_extra *extra;
   

@@ -371,6 +371,8 @@ struct peer
 #define PEER_CAP_RESTART_BIT_ADV            (1 << 9) /* sent restart state */
 #define PEER_CAP_RESTART_BIT_RCV            (1 << 10) /* peer restart state */
 
+  // TODO (tarpan) determine if the peer supports tarpan and/or specific protocols
+
   /* Capability flags (reset in bgp_stop) */
   u_int16_t af_cap[AFI_MAX][SAFI_MAX];
 #define PEER_CAP_ORF_PREFIX_SM_ADV          (1 << 0) /* send-mode advertised */
@@ -648,6 +650,7 @@ struct bgp_nlri
 #define BGP_ATTR_AS4_PATH                       17
 #define BGP_ATTR_AS4_AGGREGATOR                 18
 #define BGP_ATTR_AS_PATHLIMIT                   21
+#define BGP_ATTR_TARPAN                         19 // using bit 19 so that it fits on a 32 bit flag
 
 /* BGP update origin.  */
 #define BGP_ORIGIN_IGP                           0
